@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "230863344113",
+    "project_id": "links-170cf",
+    "storage_bucket": "links-170cf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230863344113:android:bf453202f44820d5b27450",
+        "android_client_info": {
+          "package_name": "aheschl.links"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "230863344113-cbmphqc8rebc96j6mm4c82hv41bf5oho.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCeMxTPwj3-Nim2Hdl-1Pc39mP0NqrMDhk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "230863344113-cbmphqc8rebc96j6mm4c82hv41bf5oho.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
