@@ -5,12 +5,13 @@ import 'package:links/constants/event.dart';
 import 'package:links/constants/notification.dart';
 import 'package:links/screens/home/create/create_wrapper.dart';
 import 'package:links/screens/home/create/event/create.dart';
-import 'file:///C:/Users/Andrew/AndroidStudioProjects/links/lib/screens/home/find/find.dart';
 import 'package:links/screens/home/mine/mine.dart';
 import 'package:links/screens/home/mine/mine_wrapper.dart';
 import 'package:links/services/database_service.dart';
 import 'package:links/widgets/event_widget.dart';
 import 'package:links/widgets/show_notifications.dart';
+
+import 'find/find.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -18,37 +19,31 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   bool newNotifications = false;
 
   PageController _pageController;
   int selectedScreenIndex = 0;
 
-  changeIndex(int i){
+  changeIndex(int i) {
     setState(() {
       selectedScreenIndex = i;
       _pageController.animateToPage(0,
-          duration: Duration(milliseconds: 500),
-          curve: Curves.easeOut
-      );
+          duration: Duration(milliseconds: 500), curve: Curves.easeOut);
     });
   }
 
   void showNotifications() async {
     await showModalBottomSheet(
-        context: context,
-        builder: (context) => ShowNotifications()
-    );
+        context: context, builder: (context) => ShowNotifications());
 
     setState(() {
       newNotifications = false;
     });
-
   }
 
   getNewNotification() async {
     int notifs = await DatabaseService().amountOfNotifs();
-    if(notifs > 0){
+    if (notifs > 0) {
       setState(() {
         newNotifications = true;
       });
@@ -64,12 +59,13 @@ class _HomeState extends State<Home> {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Got a message whilst in the foreground!');
 
-      if(message.data['unsubscribe'] != null){
+      if (message.data['unsubscribe'] != null) {
         print(message.data['unsubscribe']);
-        FirebaseMessaging.instance.unsubscribeFromTopic(message.data['unsubscribe']);
+        FirebaseMessaging.instance
+            .unsubscribeFromTopic(message.data['unsubscribe']);
       }
 
-      if(message.data['subscribe'] != null){
+      if (message.data['subscribe'] != null) {
         print(message.data['subscribe']);
         FirebaseMessaging.instance.subscribeToTopic(message.data['subscribe']);
       }
@@ -83,7 +79,6 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       bottomNavigationBar: BottomAppBar(
         elevation: 0,
@@ -100,15 +95,16 @@ class _HomeState extends State<Home> {
               tooltip: "Find",
               icon: Icon(
                 Icons.search,
-                color: selectedScreenIndex == 0 ? Theme.of(context).cardColor : Colors.black,
+                color: selectedScreenIndex == 0
+                    ? Theme.of(context).cardColor
+                    : Colors.black,
               ),
               onPressed: () {
                 setState(() {
                   selectedScreenIndex = 0;
                   _pageController.animateToPage(0,
                       duration: Duration(milliseconds: 500),
-                      curve: Curves.easeOut
-                  );
+                      curve: Curves.easeOut);
                 });
               },
             ),
@@ -118,15 +114,16 @@ class _HomeState extends State<Home> {
               iconSize: selectedScreenIndex == 2 ? 29 : 24,
               icon: Icon(
                 Icons.menu,
-                color: selectedScreenIndex == 2 ? Theme.of(context).cardColor : Colors.black,
+                color: selectedScreenIndex == 2
+                    ? Theme.of(context).cardColor
+                    : Colors.black,
               ),
               onPressed: () {
                 setState(() {
                   selectedScreenIndex = 2;
                   _pageController.animateToPage(2,
                       duration: Duration(milliseconds: 500),
-                      curve: Curves.easeOut
-                  );
+                      curve: Curves.easeOut);
                 });
               },
             )
@@ -137,24 +134,33 @@ class _HomeState extends State<Home> {
         title: Text("Links"),
         actions: [
           IconButton(
-              onPressed: (){
-                Navigator.pushNamed(context, '/settings');
-              },
-              icon: Icon(Icons.account_circle, color: Colors.white,),
+            onPressed: () {
+              Navigator.pushNamed(context, '/settings');
+            },
+            icon: Icon(
+              Icons.account_circle,
+              color: Colors.white,
+            ),
           ),
           Stack(
             children: [
               Center(
                 child: IconButton(
                   icon: Icon(Icons.notifications),
-                  onPressed: ()=>showNotifications(),
+                  onPressed: () => showNotifications(),
                 ),
               ),
-              newNotifications ? Positioned(
-                child: Icon(Icons.circle, color: Colors.red, size: 10,),
-                top: 8,
-                right: 15,
-              ) : SizedBox()
+              newNotifications
+                  ? Positioned(
+                      child: Icon(
+                        Icons.circle,
+                        color: Colors.red,
+                        size: 10,
+                      ),
+                      top: 8,
+                      right: 15,
+                    )
+                  : SizedBox()
             ],
           )
         ],
@@ -162,7 +168,7 @@ class _HomeState extends State<Home> {
       body: SizedBox.expand(
         child: PageView(
           controller: _pageController,
-          onPageChanged: (index){
+          onPageChanged: (index) {
             setState(() {
               selectedScreenIndex = index;
             });
@@ -178,24 +184,21 @@ class _HomeState extends State<Home> {
         child: Icon(
           Icons.add,
           size: selectedScreenIndex == 1 ? 29 : 24,
-          color: selectedScreenIndex == 1 ? Theme.of(context).cardColor : Colors.black,
+          color: selectedScreenIndex == 1
+              ? Theme.of(context).cardColor
+              : Colors.black,
         ),
-        onPressed: (){
+        onPressed: () {
           setState(() {
             selectedScreenIndex = 1;
             _pageController.animateToPage(1,
-                duration: Duration(milliseconds: 500),
-                curve: Curves.easeOut
-            );
+                duration: Duration(milliseconds: 500), curve: Curves.easeOut);
           });
         },
-
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.miniCenterDocked,
       resizeToAvoidBottomInset: false,
-
     );
   }
-
 }
-
