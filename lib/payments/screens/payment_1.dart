@@ -1,5 +1,4 @@
-
-import 'package:braintree/braintree.dart';
+import 'package:flutter_braintree/flutter_braintree.dart';
 import 'package:flutter/material.dart';
 import 'package:links/constants/event.dart';
 import 'package:links/widgets/event_widget.dart';
@@ -12,11 +11,9 @@ class PaymentMainPage extends StatefulWidget {
 }
 
 class _PaymentMainPageState extends State<PaymentMainPage> {
-
   Event event;
 
-  startPayment()async{
-
+  startPayment() async {
     final request = BraintreeDropInRequest(
       tokenizationKey: 'sandbox_q7zgyn9g_fr7wvkwvcn3mw39z',
       collectDeviceData: true,
@@ -35,32 +32,27 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
 
     if (result != null) {
       var resultHTTP = await http.post(
-        Uri.parse("https://us-central1-links-170cf.cloudfunctions.net/paypalPayment"),
-        body: {
-          'payment_method_nonce' : result.paymentMethodNonce.toString(),
-          'ammount': event.admissionPrice,
-          'device_data': result.deviceData
-        }
-      );
+          Uri.parse(
+              "https://us-central1-links-170cf.cloudfunctions.net/paypalPayment"),
+          body: {
+            'payment_method_nonce': result.paymentMethodNonce.toString(),
+            'ammount': event.admissionPrice,
+            'device_data': result.deviceData
+          });
 
       print(resultHTTP.body);
 
-      if(resultHTTP.body == "Success"){
+      if (resultHTTP.body == "Success") {
         //Add to event + anything else after payment
 
-
-
       }
-
     } else {
       print('Selection was canceled.');
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
-
     event = ModalRoute.of(context).settings.arguments as Event;
 
     return Scaffold(
@@ -75,21 +67,17 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
             width: double.infinity,
             height: 50,
             child: ElevatedButton.icon(
-              style: ButtonStyle(
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(0),
-                  )
-                )
-              ),
-              onPressed: ()=>startPayment(),
-              icon: Icon(Icons.payment),
-              label: Text("Pay and join")
-            ),
+                style: ButtonStyle(
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(0),
+                ))),
+                onPressed: () => startPayment(),
+                icon: Icon(Icons.payment),
+                label: Text("Pay and join")),
           )
         ],
       ),
     );
   }
-
 }

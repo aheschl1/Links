@@ -25,7 +25,7 @@ dependencies:
     sdk: flutter
 
   firebase_core: ^1.2.0
-  firebase_auth: ^1.1.0
+  firebase_auth: ^1.2.0
   cloud_firestore: ^1.0.5
   firebase_analytics: ^8.1.0
   provider: ^5.0.0
@@ -35,13 +35,13 @@ dependencies:
   intl: ^0.17.0
   multi_select_flutter: ^4.0.0
   searchable_dropdown: ^1.1.3
-  braintree: ^0.2.0
+  flutter_braintree: ^1.2.1
   http: ^0.13.3
   geoflutterfire: ^3.0.0-nullsafety.2
   geolocator: ^7.0.3
   connectivity: ^3.0.3
-  firebase_messaging: ^9.1.3
-  flutter_local_notifications: ^5.0.0+4
+  firebase_messaging: ^10.0.0
+  flutter_local_notifications: ^6.0.0
   shared_preferences: ^2.0.5
 
 dev_dependencies:
