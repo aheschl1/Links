@@ -1,6 +1,12 @@
+import 'dart:convert';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_braintree/flutter_braintree.dart';
 import 'package:flutter/material.dart';
 import 'package:links/constants/event.dart';
+import 'package:links/constants/friend_data.dart';
+import 'package:links/constants/request.dart';
+import 'package:links/services/database_service.dart';
 import 'package:links/widgets/event_widget.dart';
 
 import 'package:http/http.dart' as http;
@@ -12,6 +18,8 @@ class PaymentMainPage extends StatefulWidget {
 
 class _PaymentMainPageState extends State<PaymentMainPage> {
   Event event;
+  FriendData me;
+  static const String PAYPAL_OATH = "";
 
   startPayment() async {
     final request = BraintreeDropInRequest(
@@ -32,29 +40,60 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
 
     if (result != null) {
       var resultHTTP = await http.post(
-          Uri.parse(
-              "https://us-central1-links-170cf.cloudfunctions.net/paypalPayment"),
+          Uri.parse("https://us-central1-links-170cf.cloudfunctions.net/paypalPayment"),
           body: {
             'payment_method_nonce': result.paymentMethodNonce.toString(),
             'ammount': event.admissionPrice,
-            'device_data': result.deviceData
+            'device_data': result.deviceData,
+            'userID': FirebaseAuth.instance.currentUser.uid,
+            'eventId': event.docId,
+            'paymentRecipient': event.owner
           });
 
-      print(resultHTTP.body);
-
-      if (resultHTTP.body == "Success") {
-        //Add to event + anything else after payment
-
+      if (resultHTTP.body != "Error") {
+        paymentSuccess(resultHTTP.body);
       }
     } else {
       print('Selection was canceled.');
     }
   }
 
+  void paymentSuccess(String body) {
+    joinEvent(event);
+  }
+
+  joinEvent(Event event) async {
+    String result;
+
+    if(!event.requireConfirmation){
+      result = await DatabaseService().joinEvent(event);
+    }else{
+      Request request = Request(userId: FirebaseAuth.instance.currentUser.uid, decision: Request.PENDING, userEmail: me.email, userName: me.name);
+      result = await DatabaseService().requestToJoin(event, request);
+    }
+    final snackBar = SnackBar(
+      content: Text(result),
+      behavior: SnackBarBehavior.floating, // Add this line
+    );
+    ScaffoldMessenger.of(context).showSnackBar(
+      snackBar,
+    );
+
+    if(!event.requireConfirmation){
+      Navigator.of(context).pushReplacementNamed("/view_event", arguments:  event);
+    }else{
+      Navigator.of(context).pop();
+    }
+
+  }
+  getMe()async{
+    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser.uid));
+  }
+
   @override
   Widget build(BuildContext context) {
     event = ModalRoute.of(context).settings.arguments as Event;
-
+    getMe();
     return Scaffold(
       appBar: AppBar(
         title: Text("Payment to join"),
@@ -80,4 +119,5 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
       ),
     );
   }
+
 }

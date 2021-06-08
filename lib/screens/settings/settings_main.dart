@@ -1,11 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:links/constants/friend_data.dart';
 import 'package:links/constants/user_data_save.dart';
 import 'package:links/screens/alternate/manage_tags.dart';
 import 'package:links/services/auth_service.dart';
 import 'package:links/services/database_service.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
 import 'add_friends.dart';
 import 'edit_name_and_email.dart';
@@ -43,60 +45,154 @@ class _SettingsState extends State<Settings> {
     getMyData();
   }
 
-  @override
-  Widget build(BuildContext context) {
-
-    logout() async{
-      AuthService authService = AuthService();
-      var result = await authService.signOut();
-      if(result is String){
-        ScaffoldMessenger.of(context).showSnackBar(
+  logout() async{
+    AuthService authService = AuthService();
+    var result = await authService.signOut();
+    if(result is String){
+      ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(result),
             duration: Duration(
                 seconds: 5
             ),
           )
-        );
-      }
-      else{Navigator.of(context).pop();}
+      );
     }
+    else{Navigator.of(context).pop();}
+  }
 
-    addFriends(){
-      var bottomSheetController = scaffoldKey.currentState.showBottomSheet(
-        (context) => Container(
+  addFriends(){
+    var bottomSheetController = scaffoldKey.currentState.showBottomSheet(
+          (context) => Container(
           height: 400,
           width: double.infinity,
           color: Colors.white,
           child: AddFriends()
-        ),
-      );
+      ),
+    );
 
-      bottomSheetController.closed.then((value) => getMyData());
-    }
+    bottomSheetController.closed.then((value) => getMyData());
+  }
 
-    editMyNameAndEmail(){
-      var bottomSheetController = scaffoldKey.currentState.showBottomSheet(
+  editMyNameAndEmail(){
+    var bottomSheetController = scaffoldKey.currentState.showBottomSheet(
           (context) => Container(
-            height: 400,
-            width: double.infinity,
-            color: Colors.white,
-            child: EditNameAndEmail(nameOg: me.name, bioOg: me.bio,)
-          ),
-      );
+          height: 400,
+          width: double.infinity,
+          color: Colors.white,
+          child: EditNameAndEmail(nameOg: me.name, bioOg: me.bio,)
+      ),
+    );
 
-      bottomSheetController.closed.then((value) => getMyData());
+    bottomSheetController.closed.then((value) => getMyData());
 
-    }
+  }
 
-    manageTagNotifs(){
-     showModalBottomSheet(
+  manageTagNotifs(){
+    showModalBottomSheet(
         context: context,
         builder: (context){
           return ManageTagSubs();
         }
-      );
-    }
+    );
+  }
+
+  collectPayout() async {
+    showModalBottomSheet(
+      context: context,
+      builder:(context) {
+
+        return Container(
+          child: FutureBuilder<UserData>(
+            future: DatabaseService().getUserPreferences(FirebaseAuth.instance.currentUser.uid),
+            builder: (context, snapshot){
+              if(snapshot.connectionState == ConnectionState.done){
+
+                UserData myData = snapshot.data;
+
+                if(myData.paypalKey == null || myData.paypalKey.length == 0){
+                  return Column(
+                    children: [
+                      SizedBox(height: 10,),
+                      Text(
+                        'You need to connect to PayPal',
+                        style: TextStyle(
+                            fontSize: 20
+                        ),
+                      ),
+                      SizedBox(height: 10,),
+                      ElevatedButton.icon(
+                        label: Text("Login or create an account"),
+                        icon: Icon(Icons.payment),
+                        onPressed: ()=>loginWithPaypal(),
+                      )
+                    ],
+                  );
+                }
+
+                return Column(
+                  children: [
+                    SizedBox(height: 10,),
+                    Text(
+                      'You\'re all setup',
+                      style: TextStyle(
+                        fontSize: 20
+                      ),
+                    ),
+                    SizedBox(height: 10,),
+                    ElevatedButton.icon(
+                      label: Text("Collect a payout!"),
+                      icon: Icon(Icons.attach_money),
+                      onPressed: ()=>initiatePayout(),
+                    )
+                  ],
+                );
+
+              }else{
+                return SpinKitFoldingCube(color: Colors.white,);
+              }
+            },
+          ),
+        );
+
+      }
+    );
+  }
+
+  initiatePayout() async {
+    var resultHTTP = await http.post(
+        Uri.parse("https://us-central1-links-170cf.cloudfunctions.net/requestUserPayout"),
+        body: {
+          'uid' : FirebaseAuth.instance.currentUser.uid,
+        });
+
+    Navigator.of(context).pop();
+    final snackBar = SnackBar(
+      content: Text(resultHTTP.body),
+      behavior: SnackBarBehavior.floating, // Add this line
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+  }
+
+  loginWithPaypal() async {
+
+    final Uri uri = Uri.https(
+        'links-170cf.firebaseapp.com',
+        '/paypal_auth.html',
+        {
+          'uid' : FirebaseAuth.instance.currentUser.uid
+        }
+    );
+
+    print(uri.toString());
+
+    await canLaunch(uri.toString()) ? await launch(uri.toString()) : throw 'Something went wrong';
+    Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
 
     return Scaffold(
       key: scaffoldKey,
@@ -200,7 +296,21 @@ class _SettingsState extends State<Settings> {
                   ),
                 )
             ),
-
+            Card(
+                child: InkWell(
+                  onTap: ()=>collectPayout(),
+                  child: ListTile(
+                    leading: Icon(Icons.attach_money, color: Colors.blue, size: 30.0),
+                    title: Text(
+                      "Collect payout",
+                      style: TextStyle(
+                          fontSize: 15
+                      ),
+                    ),
+                    subtitle: Text("Collect money that you have earned"),
+                  ),
+                )
+            ),
           ],
         ),
       ),
