@@ -374,38 +374,44 @@ class _MyGroupOwnState extends State<MyGroupOwn> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Expanded(
-                child: ElevatedButton.icon(
-                  icon: Icon(Icons.group),
-                  label: Text("Group chat"),
-                  onPressed: widget.group.groupchatId == null ? null : (){openGroupchat();},
-                  style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(0),
-                      )
-                    ),
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
-                        return Colors.blueGrey;
-                      },),
-                  )
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton.icon(
+                    icon: Icon(Icons.group),
+                    label: Text("Group chat"),
+                    onPressed: widget.group.groupchatId == null ? null : (){openGroupchat();},
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                        )
+                      ),
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+                          return Colors.blueGrey;
+                        },),
+                    )
+                  ),
                 ),
               ),
               !widget.group.requireConfirmation ? SizedBox() : Expanded(
-                child: ElevatedButton.icon(
-                  icon: Icon(Icons.all_inbox_rounded),
-                  label: Text("Requests"),
-                  onPressed: ()=>showRequests(),
-                  style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0),
-                      )
-                    ),
-                    backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
-                          return Colors.blueAccent;
-                      },
-                    ),
-                  )
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton.icon(
+                    icon: Icon(Icons.all_inbox_rounded),
+                    label: Text("Requests"),
+                    onPressed: ()=>showRequests(),
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        )
+                      ),
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+                            return Colors.blueAccent;
+                        },
+                      ),
+                    )
+                  ),
                 ),
               )
             ],

@@ -1505,8 +1505,10 @@ class DatabaseService {
   Future<List<String>> getTagsSubbed() async {
     UserData userData = await getUserPreferences(user.uid);
     List<String> tags = [];
-    for (var item in userData.subscribedTags) {
-      tags.add(item.toString());
+    if(userData.subscribedTags!=null){
+      for (var item in userData.subscribedTags) {
+        tags.add(item.toString());
+      }
     }
     return tags;
   }
@@ -1553,4 +1555,24 @@ class DatabaseService {
     ];
     return {'event': parts[0], 'group': parts[1]};
   }
+
+  Future calculateAmountOwed() async {
+    var amountOwed = 0.0;
+    await firestore.collection('payments')
+        .where('paymentRecipient', isEqualTo: user.uid)
+        .where('payedOut', isEqualTo: false)
+        .get()
+        .then((value) {
+           for(QueryDocumentSnapshot doc in value.docs){
+             amountOwed += double.parse(doc.data()['amount']);
+             print(amountOwed);
+           }
+         })
+        .catchError((e){
+          print(e);
+        });
+
+    return amountOwed;
+  }
+
 }

@@ -40,10 +40,10 @@ class EditNameAndEmail extends StatelessWidget {
             style: TextStyle(
               letterSpacing: 1,
               fontSize: 20,
-              color: Colors.black
+              color: Colors.white
             ),
           ),
-          Divider(height: 40, color: Colors.black,),
+          Divider(height: 40, color: Colors.black45,),
           Form(
             key: _formKey,
             child: Column(
@@ -60,12 +60,15 @@ class EditNameAndEmail extends StatelessWidget {
                   decoration: InputDecoration(
                     hintText: "Enter new name",
                     filled: true,
-                    fillColor: Colors.black54,
+                    fillColor: Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: const BorderRadius.all(
                         const Radius.circular(10.0),
                       ),
                     ),
+                  ),
+                  style: TextStyle(
+                    color: Colors.black
                   ),
                 ),
                 SizedBox(
@@ -75,10 +78,11 @@ class EditNameAndEmail extends StatelessWidget {
                   controller: bioController,
                   minLines: 5,
                   maxLines: 6,
+                  style: TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     hintText: "Enter bio",
                     filled: true,
-                    fillColor: Colors.black54,
+                    fillColor: Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: const BorderRadius.all(
                         const Radius.circular(10.0),
@@ -86,15 +90,14 @@ class EditNameAndEmail extends StatelessWidget {
                     ),
                   ),
                 ),
+                ElevatedButton.icon(
+                  icon: Icon(Icons.check),
+                  label: Text("Save"),
+                  onPressed: ()=>save(),
+                )
               ],
             ),
           ),
-          Expanded(child: Text("")),
-          ElevatedButton.icon(
-            icon: Icon(Icons.check),
-            label: Text("Save"),
-            onPressed: ()=>save(),
-          )
         ],
       ),
     );

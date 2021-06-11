@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:links/constants/event.dart';
 import 'package:links/constants/friend_data.dart';
@@ -54,40 +55,47 @@ class _ManageMyPostState extends State<ManageMyPost> {
         children: [
           WidgetMyPage(eventUse),
           Row(
+            mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Expanded(
-                child: ElevatedButton.icon(
-                  icon: Icon(Icons.group),
-                  label: Text("Group chat"),
-                  onPressed: widget.event.groupChatEnabledID == null ? null : (){openGroupchat();},
-                  style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(0),
-                          )
-                      ),
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
-                        return Colors.blueGrey;
-                      },),
-                    )
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton.icon(
+                    icon: Icon(Icons.group),
+                    label: Text("Group chat"),
+                    onPressed: widget.event.groupChatEnabledID == null ? null : (){openGroupchat();},
+                    style: ButtonStyle(
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            )
+                        ),
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+                          return Colors.blueGrey;
+                        },),
+                      )
+                  ),
                 ),
               ),
               Expanded(
-                child: ElevatedButton.icon(
-                  icon: Icon(Icons.inbox),
-                  label: Text("Group inbox"),
-                  onPressed: (){openInbox();},
-                  style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(0),
-                          )
-                      ),
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
-                        return Colors.blueAccent;
-                      },),
-                    )
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton.icon(
+                    icon: Icon(Icons.inbox),
+                    label: Text("Group inbox"),
+                    onPressed: (){openInbox();},
+                    style: ButtonStyle(
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            )
+                        ),
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+                          return Colors.blueAccent;
+                        },),
+                      )
+                  ),
                 ),
               ),
             ],

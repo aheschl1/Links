@@ -24,6 +24,7 @@ class _SettingsState extends State<Settings> {
 
   FriendData me;
   UserData myData;
+  var amountOwed;
 
   void getMyData() async {
     String uid = FirebaseAuth.instance.currentUser.uid;
@@ -43,6 +44,7 @@ class _SettingsState extends State<Settings> {
   void initState() {
     super.initState();
     getMyData();
+    calculateAmountOwed();
   }
 
   logout() async{
@@ -62,29 +64,21 @@ class _SettingsState extends State<Settings> {
   }
 
   addFriends(){
-    var bottomSheetController = scaffoldKey.currentState.showBottomSheet(
-          (context) => Container(
+    showModalBottomSheet(
+      context: context,
+        builder: (context) => Container(
           height: 400,
           width: double.infinity,
-          color: Colors.white,
           child: AddFriends()
       ),
-    );
-
-    bottomSheetController.closed.then((value) => getMyData());
+    ).then((value) => getMyData());
   }
 
   editMyNameAndEmail(){
-    var bottomSheetController = scaffoldKey.currentState.showBottomSheet(
-          (context) => Container(
-          height: 400,
-          width: double.infinity,
-          color: Colors.white,
-          child: EditNameAndEmail(nameOg: me.name, bioOg: me.bio,)
-      ),
-    );
-
-    bottomSheetController.closed.then((value) => getMyData());
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => EditNameAndEmail(nameOg: me.name, bioOg: me.bio,),
+    ).then((value) => getMyData());
 
   }
 
@@ -95,6 +89,10 @@ class _SettingsState extends State<Settings> {
           return ManageTagSubs();
         }
     );
+  }
+
+  calculateAmountOwed() async {
+    amountOwed = await DatabaseService().calculateAmountOwed();
   }
 
   collectPayout() async {
@@ -110,7 +108,7 @@ class _SettingsState extends State<Settings> {
 
                 UserData myData = snapshot.data;
 
-                if(myData.paypalKey == null || myData.paypalKey.length == 0){
+                if(myData.paypalKey != null || myData.paypalKey.length == 0){
                   return Column(
                     children: [
                       SizedBox(height: 10,),
@@ -121,10 +119,53 @@ class _SettingsState extends State<Settings> {
                         ),
                       ),
                       SizedBox(height: 10,),
-                      ElevatedButton.icon(
-                        label: Text("Login or create an account"),
-                        icon: Icon(Icons.payment),
-                        onPressed: ()=>loginWithPaypal(),
+                      Text(
+                        "Links uses PayPal to send payouts. We do not save any of your PayPal information.",
+                        style: TextStyle(
+                            letterSpacing: 1,
+                            fontSize: 12,
+                            color: Colors.white54
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      Expanded(
+                          child:Center(
+                              child:  amountOwed == null ? SpinKitFoldingCube(color: Colors.white,) :
+                              Card(
+                                elevation: 2,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Text(
+                                    amountOwed > 0 ? "You have $amountOwed dollars waiting for you!" : "You do not have any money to collect",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ),
+                              )
+                          ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                              label: Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                child: Text("Connect to PayPal", style: TextStyle(fontSize: 20),),
+                              ),
+                              icon: Icon(Icons.login),
+                              onPressed: ()=>loginWithPaypal(),
+                              style: ButtonStyle(
+                                  elevation: MaterialStateProperty.all(20),
+                                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                                      )
+                                  )
+                              )
+                          ),
+                        ),
                       )
                     ],
                   );
@@ -140,10 +181,58 @@ class _SettingsState extends State<Settings> {
                       ),
                     ),
                     SizedBox(height: 10,),
-                    ElevatedButton.icon(
-                      label: Text("Collect a payout!"),
-                      icon: Icon(Icons.attach_money),
-                      onPressed: ()=>initiatePayout(),
+                    Text(
+                      "Your balance will be sent to your PayPal account.",
+                      style: TextStyle(
+                          letterSpacing: 1,
+                          fontSize: 12,
+                          color: Colors.white54
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    TextButton.icon(
+                      label: Text('Change PayPal accounts'),
+                      icon: Icon(Icons.logout),
+                      onPressed: ()=>loginWithPaypal(),
+                    ),
+                    Expanded(
+                      child: Center(
+                          child:  amountOwed == null ? SpinKitFoldingCube(color: Colors.white,) :
+                          Card(
+                            elevation: 2,
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Text(
+                                amountOwed > 0 ? "You have $amountOwed dollars waiting for you!" : "You do not have any money to collect",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                          )
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          label: Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                            child: Text("Collect a payout!", style: TextStyle(fontSize: 20),),
+                          ),
+                          icon: Icon(Icons.attach_money),
+                          onPressed: ()=>initiatePayout(),
+                          style: ButtonStyle(
+                            elevation: MaterialStateProperty.all(20),
+                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(20)),
+                              )
+                            )
+                          )
+                        ),
+                      ),
                     )
                   ],
                 );
@@ -184,9 +273,6 @@ class _SettingsState extends State<Settings> {
           'uid' : FirebaseAuth.instance.currentUser.uid
         }
     );
-
-    print(uri.toString());
-
     await canLaunch(uri.toString()) ? await launch(uri.toString()) : throw 'Something went wrong';
     Navigator.of(context).pop();
   }

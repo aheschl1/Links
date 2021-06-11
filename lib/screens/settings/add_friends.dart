@@ -20,7 +20,7 @@ class _AddFriendsState extends State<AddFriends> {
         "No search results",
         style: TextStyle(
           fontSize: 18,
-          color: Colors.black
+          color: Colors.white
         ),
       ),
     ],
@@ -70,15 +70,19 @@ class _AddFriendsState extends State<AddFriends> {
       child: Column(
         children: [
           TextField(
+            style: TextStyle(color: Colors.black),
             controller: searchBar,
             decoration: InputDecoration(
-              hintText: "Search names and emails",
+              hintText: "Search names or emails",
+              hintStyle: TextStyle(
+                color: Colors.black45
+              ),
               suffixIcon: IconButton(
-                icon: Icon(Icons.search),
+                icon: Icon(Icons.search, color: Colors.black),
                 onPressed: (){searchForFriends();},
               ),
               filled: true,
-              fillColor: Colors.black54,
+              fillColor: Colors.white,
               border: OutlineInputBorder(
                 borderRadius: const BorderRadius.all(
                   const Radius.circular(50.0),

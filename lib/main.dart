@@ -36,7 +36,7 @@ void main() {
 
           return StreamProvider<User>.value(
             initialData: null,
-            value: AuthService().user,
+            value: AuthService( ).user,
 
             child: MaterialApp(
               theme: ThemeData(
@@ -47,6 +47,11 @@ void main() {
                 brightness: Brightness.dark,
                 backgroundColor: Colors.black38,
                 cardColor: Colors.deepPurpleAccent,
+                bottomSheetTheme: BottomSheetThemeData(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                  ),
+                )
               ),
               routes: {
                 '/': (context)=>Wrapper(),

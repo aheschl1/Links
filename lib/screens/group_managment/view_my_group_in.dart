@@ -280,20 +280,23 @@ class _ViewMyGroupInState extends State<ViewMyGroupIn> {
           GroupMyPage(widget.group),
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton.icon(
-              icon: Icon(Icons.group),
-              label: Text("Group chat"),
-              onPressed: widget.group.groupchatId == null ? null : (){openGroupchat();},
-              style: ButtonStyle(
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(0),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton.icon(
+                icon: Icon(Icons.group),
+                label: Text("Group chat"),
+                onPressed: widget.group.groupchatId == null ? null : (){openGroupchat();},
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      )
+                  ),
+                  backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+                    return Colors.blueGrey;
+                  },),
                 )
-            ),
-            backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
-              return Colors.blueGrey;
-            },),
-        )
+              ),
             ),
           ),
           ExpansionTile(

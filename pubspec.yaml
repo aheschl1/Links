@@ -44,6 +44,7 @@ dependencies:
   flutter_local_notifications: ^6.0.0
   shared_preferences: ^2.0.5
   url_launcher: ^6.0.6
+  animated_text_kit: ^4.2.1
 
 dev_dependencies:
   flutter_test:

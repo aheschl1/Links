@@ -82,8 +82,11 @@ class _GroupMyPageState extends State<GroupMyPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
+        color: Theme.of(context).cardColor,
+      ),
       padding: EdgeInsets.all(8),
-      color: Theme.of(context).cardColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize:  MainAxisSize.min,

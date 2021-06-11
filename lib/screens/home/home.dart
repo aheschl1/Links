@@ -1,14 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:links/constants/event.dart';
-import 'package:links/constants/notification.dart';
 import 'package:links/screens/home/create/create_wrapper.dart';
-import 'package:links/screens/home/create/event/create.dart';
-import 'package:links/screens/home/mine/mine.dart';
 import 'package:links/screens/home/mine/mine_wrapper.dart';
 import 'package:links/services/database_service.dart';
-import 'package:links/widgets/event_widget.dart';
 import 'package:links/widgets/show_notifications.dart';
 
 import 'find/find.dart';

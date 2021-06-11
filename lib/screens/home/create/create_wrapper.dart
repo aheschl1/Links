@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:links/screens/home/create/event/create.dart';
@@ -25,44 +26,65 @@ class _CreateWrapperState extends State<CreateWrapper>{
 
   int state = SELECT;
 
-
   Widget _selectView(){
+
     return Container(
       padding: EdgeInsets.all(20),
       child: Column(
        children: [
-         TextButton.icon(
-           icon: Icon(Icons.arrow_upward),
-           label: Text("New Event"),
-           onPressed: (){
-             state = EVENT;
-             controller.animateToPage(state,
-                 duration: Duration(milliseconds: 500),
-                 curve: Curves.easeOut
-             );
-           },
+         Container(
+           width: double.infinity,
+           decoration: BoxDecoration(
+             color: Colors.white,
+             borderRadius: BorderRadius.all(Radius.circular(20))
+           ),
+           child: TextButton.icon(
+             icon: Icon(Icons.arrow_upward),
+             label: Text("New Event"),
+             onPressed: (){
+               state = EVENT;
+               controller.animateToPage(state,
+                   duration: Duration(milliseconds: 500),
+                   curve: Curves.easeOut
+               );
+             },
+           ),
          ),
          Expanded(
            child: Center(
-             child: Text(
-               "What do you want to create?",
-               style: TextStyle(
-                 fontSize: 20,
-                 letterSpacing: 1,
+             child:DefaultTextStyle(
+               style: const TextStyle(
+                 fontSize: 20.0,
                ),
-             ),
+               child: AnimatedTextKit(
+                 animatedTexts: [
+                   TypewriterAnimatedText(
+                       'What do you want to create?',
+                        speed: const Duration(milliseconds: 50),
+                     ),
+                 ],
+                 isRepeatingAnimation: false,
+               ),
+             )
            ),
          ),
-         TextButton.icon(
-           icon: Icon(Icons.arrow_downward),
-           label: Text("New Group"),
-           onPressed: (){
-             state = GROUP;
-             controller.animateToPage(state,
-                 duration: Duration(milliseconds: 500),
-                 curve: Curves.easeOut
-             );
-           },
+         Container(
+           width: double.infinity,
+           decoration: BoxDecoration(
+               color: Colors.white,
+               borderRadius: BorderRadius.all(Radius.circular(20))
+           ),
+           child: TextButton.icon(
+             icon: Icon(Icons.arrow_downward),
+             label: Text("New Group"),
+             onPressed: (){
+               state = GROUP;
+               controller.animateToPage(state,
+                   duration: Duration(milliseconds: 500),
+                   curve: Curves.easeOut
+               );
+             },
+           ),
          ),
          SizedBox(height: 30,)
        ],

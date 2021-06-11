@@ -176,7 +176,7 @@ class _FindState extends State<Find>{
                 });
               },
             ),
-            TextButton.icon(
+            if(currentFinding == EVENT) TextButton.icon(
               onPressed: ()=>openFilter(),
               icon: Icon(Icons.filter_alt),
               label: Text("Filter")
@@ -184,7 +184,7 @@ class _FindState extends State<Find>{
 
           ],
         ),
-        Flexible(
+        currentFinding == EVENT ? Flexible(
           flex: 0,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -194,6 +194,20 @@ class _FindState extends State<Find>{
                 letterSpacing: 1,
                 fontSize: 12,
                 color: Colors.white54
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ): Flexible(
+          flex: 0,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              "Viewing all public groups. Join a group to see what events are going on! Groups are not filtered by location.",
+              style: TextStyle(
+                  letterSpacing: 1,
+                  fontSize: 12,
+                  color: Colors.white54
               ),
               textAlign: TextAlign.center,
             ),

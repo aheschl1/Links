@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:links/constants/event.dart';
 import 'package:links/constants/friend_data.dart';
@@ -42,38 +41,44 @@ class _ManageEventInState extends State<ManageEventIn> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Expanded(
-                child: ElevatedButton.icon(
-                  icon: Icon(Icons.group),
-                  label: Text("Group chat"),
-                  onPressed: widget.event.groupChatEnabledID == null ? null : (){openGroupchat();},
-                  style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(0),
-                          )
-                      ),
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
-                        return Colors.blueGrey;
-                      },),
-                    )
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton.icon(
+                    icon: Icon(Icons.group),
+                    label: Text("Group chat"),
+                    onPressed: widget.event.groupChatEnabledID == null ? null : (){openGroupchat();},
+                    style: ButtonStyle(
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            )
+                        ),
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+                          return Colors.blueGrey;
+                        },),
+                      )
 
+                  ),
                 ),
               ),
               Expanded(
-                child: ElevatedButton.icon(
-                  icon: Icon(Icons.message),
-                  label: Text("Message owner"),
-                  onPressed: (){openOwnerChat();},
-                  style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(0),
-                          )
-                      ),
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
-                        return Colors.blueAccent;
-                      },),
-                    )
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton.icon(
+                    icon: Icon(Icons.message),
+                    label: Text("Message owner"),
+                    onPressed: (){openOwnerChat();},
+                    style: ButtonStyle(
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            )
+                        ),
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+                          return Colors.blueAccent;
+                        },),
+                      )
+                  ),
                 ),
               ),
             ],
