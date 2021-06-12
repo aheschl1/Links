@@ -10,6 +10,7 @@ import 'package:links/services/database_service.dart';
 import 'package:links/widgets/event_widget.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:links/widgets/user_in_group.dart';
 
 class PaymentMainPage extends StatefulWidget {
   @override
@@ -19,7 +20,6 @@ class PaymentMainPage extends StatefulWidget {
 class _PaymentMainPageState extends State<PaymentMainPage> {
   Event event;
   FriendData me;
-  static const String PAYPAL_OATH = "";
 
   startPayment() async {
     final request = BraintreeDropInRequest(
@@ -90,9 +90,14 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
     me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser.uid));
   }
 
+  viewFriendProfile(FriendData friendData){
+    Navigator.of(context).pushNamed('/view_profile', arguments: friendData);
+  }
+
   @override
   Widget build(BuildContext context) {
     event = ModalRoute.of(context).settings.arguments as Event;
+    event.location = 'Location hidden until you pay';
     getMe();
     return Scaffold(
       appBar: AppBar(
@@ -101,7 +106,9 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
       body: Column(
         children: [
           WidgetMyPage(event),
-          Expanded(child: SizedBox()),
+          SizedBox(height: 10,),
+          ViewUsersInGroup(event: event, onTap: viewFriendProfile,),
+          Expanded(child:SizedBox()),
           Container(
             width: double.infinity,
             height: 50,

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:links/services/database_service.dart';
 
@@ -31,7 +33,7 @@ class EditNameAndEmail extends StatelessWidget {
     nameController.text = nameOg;
     bioController.text = bioOg;
 
-    return Padding(
+    return Container(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [

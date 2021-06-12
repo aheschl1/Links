@@ -108,7 +108,7 @@ class _SettingsState extends State<Settings> {
 
                 UserData myData = snapshot.data;
 
-                if(myData.paypalKey != null || myData.paypalKey.length == 0){
+                if(myData.paypalKey == null || myData.paypalKey.length == 0){
                   return Column(
                     children: [
                       SizedBox(height: 10,),
@@ -145,28 +145,20 @@ class _SettingsState extends State<Settings> {
                               )
                           ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                              label: Padding(
-                                padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                                child: Text("Connect to PayPal", style: TextStyle(fontSize: 20),),
-                              ),
-                              icon: Icon(Icons.login),
-                              onPressed: ()=>loginWithPaypal(),
-                              style: ButtonStyle(
-                                  elevation: MaterialStateProperty.all(20),
-                                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                                      )
-                                  )
-                              )
-                          ),
+                      Container(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton.icon(
+                            style: ButtonStyle(
+                                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(0),
+                                    ))),
+                            onPressed: () => loginWithPaypal(),
+                            icon: Icon(Icons.login),
+                            label: Text("Connect to PayPal")
                         ),
-                      )
+                      ),
                     ],
                   );
                 }
@@ -212,28 +204,20 @@ class _SettingsState extends State<Settings> {
                           )
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          label: Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                            child: Text("Collect a payout!", style: TextStyle(fontSize: 20),),
-                          ),
-                          icon: Icon(Icons.attach_money),
-                          onPressed: ()=>initiatePayout(),
+                    Container(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton.icon(
                           style: ButtonStyle(
-                            elevation: MaterialStateProperty.all(20),
-                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(20)),
-                              )
-                            )
-                          )
-                        ),
+                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(0),
+                                  ))),
+                          onPressed: ()=>initiatePayout(),
+                          icon: Icon(Icons.attach_money),
+                          label: Text("Collect a payout!")
                       ),
-                    )
+                    ),
                   ],
                 );
 
