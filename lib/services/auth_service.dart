@@ -32,6 +32,7 @@ class AuthService{
 
     try{
       UserCredential result = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
+      result.user.updateProfile(displayName: name);
       DatabaseService().createUserPage(email, name, result.user.uid);
       FirebaseMessaging.instance.subscribeToTopic(result.user.uid);
       return result.user;

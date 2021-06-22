@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:links/constants/ad_ids.dart';
 import 'package:links/payments/screens/payment_1.dart';
 import 'package:links/screens/chats/groupchat.dart';
 import 'package:links/screens/chats/owner_inbox.dart';
@@ -10,21 +11,25 @@ import 'package:links/screens/chats/private_message.dart';
 import 'package:links/screens/event_managment/event_managment.dart';
 import 'package:links/screens/group_managment/group_managment.dart';
 import 'package:links/screens/loading.dart';
+import 'package:links/screens/settings/edit_name_and_email.dart';
 import 'package:links/screens/settings/settings_main.dart';
 import 'package:links/services/auth_service.dart';
 import 'package:links/services/notification_service.dart';
 import 'package:links/services/shared_service.dart';
 import 'package:links/wrapper.dart';
+import 'package:native_admob_flutter/native_admob_flutter.dart';
+import 'package:place_picker/place_picker.dart';
 import 'package:place_picker/place_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:links/screens/friends/manage_friends.dart';
 import 'package:links/screens/friends/view_profile.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-void main() {
+void main(){
 
   WidgetsFlutterBinding.ensureInitialized();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  MobileAds.initialize();
 
   runApp(
 
@@ -63,7 +68,8 @@ void main() {
                 '/inbox':(context)=>OwnerInbox(),
                 '/payments':(context)=>PaymentMainPage(),
                 '/friends' : (context)=>ManageFriends(),
-                '/view_profile': (context)=>ViewFriend()
+                '/view_profile': (context)=>ViewFriend(),
+                '/edit_info' : (context)=>EditNameAndEmail()
 
               },
               initialRoute: '/',

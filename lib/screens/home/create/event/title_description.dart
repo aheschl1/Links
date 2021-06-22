@@ -77,7 +77,7 @@ class _EnterTitleAndDescriptionState extends State<EnterTitleAndDescription> {
                 TextFormField(
                   style: TextStyle(color: Colors.black),
                   maxLines: 5,
-                  minLines: 5,
+                  minLines: 2,
                   validator: (val){
                     if(val.length <= 100 && val.length >= 10){
                       return null;

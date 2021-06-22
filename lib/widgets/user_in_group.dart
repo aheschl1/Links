@@ -33,15 +33,22 @@ class _ManageUsersInGroupState extends State<ManageUsersInGroup> {
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
                           child: InkWell(
                             onTap: ()=>widget.onTap(snapshot.data[index]),
                             child: Padding(
                               padding: EdgeInsets.all(8),
                               child: Row(
-                                children: [
+                                children: [ 
                                   Text(snapshot.data[index].name),
                                   SizedBox(width: 18,),
-                                  Text(snapshot.data[index].email),
+                                  Flexible(
+                                    child: Text(
+                                      snapshot.data[index].email.substring(0, 15) + '...'
+                                    )
+                                  ),
                                   Spacer(),
                                   TextButton.icon(
                                       onPressed: (){widget.removeUser(snapshot.data[index]);},
@@ -100,15 +107,22 @@ class _ViewUsersInGroupState extends State<ViewUsersInGroup> {
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
                             child: InkWell(
                               onTap: ()=>widget.onTap(snapshot.data[index]),
                               child: Padding(
-                                padding: EdgeInsets.all(8),
+                                padding: EdgeInsets.all(20),
                                 child: Row(
                                   children: [
                                     Text(snapshot.data[index].name),
                                     SizedBox(width: 18,),
-                                    Text(snapshot.data[index].email),
+                                    Flexible(
+                                        child: Text(
+                                            snapshot.data[index].email.substring(0, 15) + '...'
+                                        )
+                                    ),
                                   ],
                                 ),
                               ),

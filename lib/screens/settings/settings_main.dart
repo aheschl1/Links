@@ -74,12 +74,9 @@ class _SettingsState extends State<Settings> {
     ).then((value) => getMyData());
   }
 
-  editMyNameAndEmail(){
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => EditNameAndEmail(nameOg: me.name, bioOg: me.bio,),
-    ).then((value) => getMyData());
-
+  editMyNameAndEmail() async {
+    await Navigator.of(context).pushNamed('/edit_info', arguments: me);
+    getMyData();
   }
 
   manageTagNotifs(){

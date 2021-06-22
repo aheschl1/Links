@@ -45,6 +45,8 @@ dependencies:
   shared_preferences: ^2.0.5
   url_launcher: ^6.0.6
   animated_text_kit: ^4.2.1
+  google_mobile_ads: ^0.13.0
+  native_admob_flutter: ^1.4.0
 
 dev_dependencies:
   flutter_test:
