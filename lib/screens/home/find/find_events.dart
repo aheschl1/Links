@@ -50,9 +50,7 @@ class _FindEventsState extends State<FindEvents> {
           builder: (context, snapshot){
             if(snapshot.connectionState == ConnectionState.done){
               List<Event> eventsToDisplay = snapshot.data;
-
               List displayOutline = getDisplayOutline(eventsToDisplay);
-
               return Container(
                 padding: EdgeInsets.fromLTRB(8, 15, 8, 8),
                 child: eventsToDisplay.length == 0 ?  TextButton.icon(label: Text("There are no public events to display"), icon: Icon(Icons.refresh), onPressed: (){setState(() {});},) :
@@ -122,7 +120,7 @@ class _FindEventsState extends State<FindEvents> {
 
                       );
                     }else{
-                      return AdControl();
+                      return AdControl(adId: AdIds().publicEventAdId,);
                     }
                   },
                 ),
