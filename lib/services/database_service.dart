@@ -6,11 +6,13 @@ import 'package:links/constants/blog_post.dart';
 import 'package:links/constants/event.dart';
 import 'package:links/constants/friend_data.dart';
 import 'package:links/constants/group.dart';
+import 'package:links/constants/level_types.dart';
 import 'package:links/constants/message.dart';
 import 'package:links/constants/request.dart';
 import 'package:links/constants/tag.dart';
 import 'package:links/constants/user_data_save.dart';
 import 'package:links/constants/notification.dart';
+import 'package:links/screens/settings/account_level.dart';
 
 class DatabaseService {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -839,6 +841,14 @@ class DatabaseService {
         .set(userData.toMap())
         .then((value) => print("User Entry Added"))
         .catchError((error) => print("Failed to add user: $error"));
+
+    users
+        .doc(uid)
+        .collection("level")
+        .doc("level")
+        .set({'level' : AccountLevels.BASIC})
+        .then((value) => print("User Entry Added"))
+        .catchError((error) => print("Failed to add user: $error"));
   }
 
   Future<UserData> getUserPreferences(String uid) async {
@@ -1573,6 +1583,12 @@ class DatabaseService {
         });
 
     return amountOwed;
+  }
+
+  Future<AccountLevels> getAccountLevel() async {
+    var data = await users.doc(user.uid).collection('level').doc('level').get();
+    AccountLevels level = AccountLevels.values[data.data()['level']];
+    return level;
   }
 
 }

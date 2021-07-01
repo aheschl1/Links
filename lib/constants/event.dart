@@ -1,6 +1,5 @@
 
 import 'package:geoflutterfire/geoflutterfire.dart';
-import 'package:intl/intl.dart';
 
 class Event{
 

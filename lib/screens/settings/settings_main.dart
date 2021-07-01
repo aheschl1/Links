@@ -9,6 +9,7 @@ import 'package:links/services/database_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
+import 'account_level.dart';
 import 'add_friends.dart';
 import 'edit_name_and_email.dart';
 
@@ -245,6 +246,17 @@ class _SettingsState extends State<Settings> {
 
   }
 
+  accountPrivalage(){
+
+    showModalBottomSheet(
+      context: context,
+      builder: (context){
+        return AccountLevel();
+      }
+    );
+
+  }
+
   loginWithPaypal() async {
 
     final Uri uri = Uri.https(
@@ -313,6 +325,11 @@ class _SettingsState extends State<Settings> {
                           ),
                         ),
                       ),
+                      TextButton.icon(
+                        onPressed: ()=>manageFriends(),
+                        label: Text("Manage your friends"),
+                        icon: Icon(Icons.people),
+                      ),
                     ],
                   ),
                 ),
@@ -327,6 +344,7 @@ class _SettingsState extends State<Settings> {
               ],
             ),
             Divider(height: 30,),
+            SizedBox(height: 10,),
             Card(
               child: InkWell(
                 onTap: ()=>addFriends(),
@@ -342,12 +360,6 @@ class _SettingsState extends State<Settings> {
                 ),
               )
             ),
-            TextButton.icon(
-              onPressed: ()=>manageFriends(),
-              label: Text("Or, manage your friends"),
-              icon: Icon(Icons.people),
-            ),
-            SizedBox(height: 10,),
             Card(
                 child: InkWell(
                   onTap: ()=>manageTagNotifs(),
@@ -375,6 +387,25 @@ class _SettingsState extends State<Settings> {
                       ),
                     ),
                     subtitle: Text("Collect money that you have earned"),
+                  ),
+                )
+            ),
+            Spacer(),
+            Card(
+                color: Colors.purple[200],
+                child: InkWell(
+                  onTap: ()=>accountPrivalage(),
+                  child: ListTile(
+                    leading: Icon(Icons.lock_outline, color: Colors.blue, size: 30.0),
+                    title: Text(
+                      "Account level",
+                      style: TextStyle(
+                        fontSize: 15,
+                      ),
+                    ),
+                    subtitle: Text(
+                      "Basic",
+                    ),
                   ),
                 )
             ),
