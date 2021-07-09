@@ -12,7 +12,6 @@ import 'package:links/constants/request.dart';
 import 'package:links/constants/tag.dart';
 import 'package:links/constants/user_data_save.dart';
 import 'package:links/constants/notification.dart';
-import 'package:links/screens/settings/account_level.dart';
 
 class DatabaseService {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -1575,14 +1574,13 @@ class DatabaseService {
         .then((value) {
            for(QueryDocumentSnapshot doc in value.docs){
              amountOwed += double.parse(doc.data()['amount']);
-             print(amountOwed);
            }
          })
         .catchError((e){
           print(e);
         });
 
-    return amountOwed;
+    return double.parse(amountOwed.toStringAsFixed(2));
   }
 
   Future<AccountLevels> getAccountLevel() async {

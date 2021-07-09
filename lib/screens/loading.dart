@@ -8,7 +8,7 @@ class Loading extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         body: Center(
-          child: SpinKitRing(
+          child: SpinKitFoldingCube(
               color:Colors.black
           ),
         ),

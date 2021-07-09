@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:links/constants/event.dart';
 import 'package:links/constants/friend_data.dart';
+import 'package:links/constants/level_types.dart';
 import 'package:links/constants/tag.dart';
 import 'package:links/services/database_service.dart';
+import 'package:links/services/shared_service.dart';
 import 'package:links/widgets/select_friends.dart';
 import 'package:links/widgets/select_tags.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +25,8 @@ class OtherSettingsAndSave extends StatefulWidget {
 }
 
 class _OtherSettingsAndSaveState extends State<OtherSettingsAndSave> {
+
+  AccountLevels accountLevelStatus;
 
   bool public = true;
   bool groupchat = true;
@@ -63,6 +67,18 @@ class _OtherSettingsAndSaveState extends State<OtherSettingsAndSave> {
 
   }
 
+  getAccountLevel() async {
+    AccountLevels temp = await SharedPreferenceService.getAccountLevel();
+    setState(() {
+      accountLevelStatus = temp;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getAccountLevel();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +145,7 @@ class _OtherSettingsAndSaveState extends State<OtherSettingsAndSave> {
                   subtitle: free ? Text("This event is free") : Text("It costs $price \$ to join"),
                   secondary: free ? Icon(Icons.money_off) : Icon(Icons.money),
                   value: free,
-                  onChanged: (val){
+                  onChanged: accountLevelStatus == AccountLevels.BASIC || accountLevelStatus == null ? null : (val){
                     setState(() {
                       free = val;
                     });

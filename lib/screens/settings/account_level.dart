@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_braintree/flutter_braintree.dart';
 import 'package:links/constants/level_types.dart';
 import 'package:links/screens/settings/account_level_descriptions/basic_description.dart';
+import 'package:links/screens/settings/account_level_descriptions/pro_desciption.dart';
 import 'package:links/services/database_service.dart';
-import 'package:http/http.dart' as http;
 
 class AccountLevel extends StatefulWidget {
-  const AccountLevel({Key key}) : super(key: key);
+  final AccountLevels accountLevelCurrent;
+
+  const AccountLevel({Key key, this.accountLevelCurrent}) : super(key: key);
 
   @override
   _AccountLevelState createState() => _AccountLevelState();
@@ -17,41 +19,6 @@ class _AccountLevelState extends State<AccountLevel> {
 
   AccountLevels accountLevelStatus;
 
-  startPayment(String amount, int level, Function paymentSuccess) async {
-    final request = BraintreeDropInRequest(
-      tokenizationKey: 'sandbox_q7zgyn9g_fr7wvkwvcn3mw39z',
-      collectDeviceData: true,
-      googlePaymentRequest: BraintreeGooglePaymentRequest(
-        totalPrice: amount,
-        currencyCode: 'CAD',
-        billingAddressRequired: false,
-      ),
-      paypalRequest: BraintreePayPalRequest(
-        amount: amount,
-        displayName: 'Links',
-      ),
-    );
-
-    BraintreeDropInResult result = await BraintreeDropIn.start(request);
-
-    if (result != null) {
-      var resultHTTP = await http.post(
-          Uri.parse("https://us-central1-links-170cf.cloudfunctions.net/upgradeAccount"),
-          body: {
-            'payment_method_nonce': result.paymentMethodNonce.toString(),
-            'ammount': amount,
-            'device_data': result.deviceData,
-            'userID': FirebaseAuth.instance.currentUser.uid,
-            'upgradeLevel' : level.toString()
-          });
-
-      if (resultHTTP.body != "Error") {
-        paymentSuccess(resultHTTP.body);
-      }
-    } else {
-      print('Selection was canceled.');
-    }
-  }
 
   void basicLevelClicked(){
     Navigator.of(context).push(
@@ -61,8 +28,16 @@ class _AccountLevelState extends State<AccountLevel> {
     );
   }
 
-  void proLevelClicked(){
-    startPayment('2', 1, (String data){
+  void proLevelClicked() async {
+    var success = await Navigator.of(context).push(
+        MaterialPageRoute(
+            builder: (_)=>ProDescription()
+        )
+    );
+    if(success == null){
+      return;
+    }
+    if(success){
       Navigator.of(context).pop();
       final snackBar = SnackBar(
         content: Text('You have successfully been upgraded to a pro account'),
@@ -71,7 +46,17 @@ class _AccountLevelState extends State<AccountLevel> {
       ScaffoldMessenger.of(context).showSnackBar(
         snackBar,
       );
-    });
+    }else{
+      Navigator.of(context).pop();
+      final snackBar = SnackBar(
+        content: Text('Something went wrong. If you were charged but have not been upgraded, contact support'),
+        behavior: SnackBarBehavior.floating, // Add this line
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        snackBar,
+      );
+    }
+
   }
 
   void advertiserLevelClicked(){
@@ -85,10 +70,11 @@ class _AccountLevelState extends State<AccountLevel> {
     });
   }
 
+
   @override
-  void initState() {
-    super.initState();
-    getAccountLevel();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    accountLevelStatus = widget.accountLevelCurrent;
   }
 
   @override
@@ -129,17 +115,6 @@ class _AccountLevelState extends State<AccountLevel> {
               borderRadius: BorderRadius.circular(20.0),
             ),
             trailing: accountLevelStatus == AccountLevels.ADVERTISER ? Icon(Icons.star) : null,
-          ),
-          Spacer(),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'All account levels over basic remove ads',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white54
-              ),
-            ),
           ),
         ],
       ),

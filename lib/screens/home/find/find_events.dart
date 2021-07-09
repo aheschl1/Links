@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:links/constants/ad_ids.dart';
 import 'package:links/constants/event.dart';
+import 'package:links/constants/level_types.dart';
 import 'package:links/services/database_service.dart';
+import 'package:links/services/shared_service.dart';
 import 'package:links/widgets/ad_widget.dart';
 import 'package:links/widgets/event_widget.dart';
 
@@ -27,25 +28,46 @@ class _FindEventsState extends State<FindEvents> {
 
   final key = GlobalKey<AnimatedListState>();
   int currentEventIndex = 0;
+  AccountLevels accountLevelStatus;
 
-   List<bool> getDisplayOutline(events){
-     List<bool> outline = [];
-     int eventsPlaced = 0;
-     for(int index = 0; eventsPlaced < events.length; index ++){
-       if((index + 1) % 3 == 0){
-         outline.add(true);
-       }else{
-         outline.add(false);
-         eventsPlaced ++;
-       }
+  List<bool> getDisplayOutline(events) {
+   List<bool> outline = [];
+
+   if(accountLevelStatus != AccountLevels.BASIC){
+     for(var ignored in events){
+       outline.add(false);
      }
      return outline;
    }
+   int eventsPlaced = 0;
+   for(int index = 0; eventsPlaced < events.length; index ++){
+     if((index + 1) % 3 == 0){
+       outline.add(true);
+     }else{
+       outline.add(false);
+       eventsPlaced ++;
+     }
+   }
+   return outline;
+  }
+
+  getAccountLevel() async {
+    AccountLevels temp = await SharedPreferenceService.getAccountLevel();
+    setState(() {
+      accountLevelStatus = temp;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getAccountLevel();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: FutureBuilder<List<Event>>(
+      child: FutureBuilder<List<Event>> (
           future: widget.currentPosition == null ? DatabaseService().getPublicEventsToDisplay(8, range: DateTimeRange(start: widget.startDate, end: widget.endDate)) :DatabaseService().getPublicEventsToDisplayLocationFiltered(8, widget.currentPosition, radius: widget.radius, range: DateTimeRange(start: widget.startDate, end: widget.endDate)),
           builder: (context, snapshot){
             if(snapshot.connectionState == ConnectionState.done){

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:links/constants/ad_ids.dart';
 import 'package:links/constants/group.dart';
+import 'package:links/constants/level_types.dart';
 import 'package:links/services/database_service.dart';
+import 'package:links/services/shared_service.dart';
 import 'package:links/widgets/ad_widget.dart';
 import 'package:links/widgets/group_widget.dart';
 
@@ -21,9 +23,18 @@ class _FindGroupsState extends State<FindGroups> {
 
   final key = GlobalKey<AnimatedListState>();
   int currentGroupIndex = 0;
+  AccountLevels accountLevelStatus;
 
   List<bool> getDisplayOutline(events){
     List<bool> outline = [];
+
+    if(accountLevelStatus != AccountLevels.BASIC){
+      for(var ignored in events){
+        outline.add(false);
+      }
+      return outline;
+    }
+
     int eventsPlaced = 0;
     for(int index = 0; eventsPlaced < events.length; index ++){
       if((index + 1) % 3 == 0){
@@ -34,6 +45,19 @@ class _FindGroupsState extends State<FindGroups> {
       }
     }
     return outline;
+  }
+
+  getAccountLevel() async {
+    AccountLevels temp = await SharedPreferenceService.getAccountLevel();
+    setState(() {
+      accountLevelStatus = temp;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getAccountLevel();
   }
 
   @override

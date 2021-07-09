@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:links/constants/ad_ids.dart';
 import 'package:links/payments/screens/payment_1.dart';
 import 'package:links/screens/chats/groupchat.dart';
 import 'package:links/screens/chats/owner_inbox.dart';
@@ -14,27 +13,37 @@ import 'package:links/screens/loading.dart';
 import 'package:links/screens/settings/edit_name_and_email.dart';
 import 'package:links/screens/settings/settings_main.dart';
 import 'package:links/services/auth_service.dart';
+import 'package:links/services/database_service.dart';
 import 'package:links/services/notification_service.dart';
 import 'package:links/services/shared_service.dart';
 import 'package:links/wrapper.dart';
 import 'package:native_admob_flutter/native_admob_flutter.dart';
-import 'package:place_picker/place_picker.dart';
 import 'package:place_picker/place_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:links/screens/friends/manage_friends.dart';
 import 'package:links/screens/friends/view_profile.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+import 'constants/level_types.dart';
+
 void main(){
+
 
   WidgetsFlutterBinding.ensureInitialized();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  MobileAds.initialize();
+
+  Future<bool> initialzeApp() async {
+    await Firebase.initializeApp();
+    await MobileAds.initialize();
+    AccountLevels level = await DatabaseService().getAccountLevel();
+    await SharedPreferenceService.setAccountLevel(level);
+    return true;
+  }
 
   runApp(
 
     FutureBuilder(
-      future: Firebase.initializeApp(),
+      future: initialzeApp(),
       builder: (context, snapshot){
 
         if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
