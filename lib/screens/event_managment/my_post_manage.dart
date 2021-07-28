@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:links/constants/event.dart';
 import 'package:links/constants/friend_data.dart';
 import 'package:links/services/database_service.dart';
@@ -45,63 +46,72 @@ class _ManageMyPostState extends State<ManageMyPost> {
   @override
   Widget build(BuildContext context) {
 
-    Event eventUse = eventNew == null ? widget.event : eventNew;
-
     return Scaffold(
       appBar: AppBar(
         title: Text("My Post"),
       ),
-      body: Column(
-        children: [
-          WidgetMyPage(eventUse),
-          Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: StreamBuilder<Event>(
+        stream: widget.event.liveUpdate,
+        builder: (context, snapshot) {
+          if(snapshot.connectionState == ConnectionState.waiting){
+            return Center(
+              child: SpinKitFoldingCube(color: Colors.white,)
+            );
+          }
+          Event event = snapshot.data;
+          return Column(
             children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton.icon(
-                    icon: Icon(Icons.group),
-                    label: Text("Group chat"),
-                    onPressed: widget.event.groupChatEnabledID == null ? null : (){openGroupchat();},
-                    style: ButtonStyle(
-                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            )
-                        ),
-                        backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
-                          return Colors.blueGrey;
-                        },),
-                      )
+              WidgetMyPage(event),
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton.icon(
+                        icon: Icon(Icons.group),
+                        label: Text("Group chat"),
+                        onPressed: widget.event.groupChatEnabledID == null ? null : (){openGroupchat();},
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                )
+                            ),
+                            backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+                              return Colors.blueGrey;
+                            },),
+                          )
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton.icon(
-                    icon: Icon(Icons.inbox),
-                    label: Text("Group inbox"),
-                    onPressed: (){openInbox();},
-                    style: ButtonStyle(
-                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            )
-                        ),
-                        backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
-                          return Colors.blueAccent;
-                        },),
-                      )
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton.icon(
+                        icon: Icon(Icons.inbox),
+                        label: Text("Group inbox"),
+                        onPressed: (){openInbox();},
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                )
+                            ),
+                            backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+                              return Colors.blueAccent;
+                            },),
+                          )
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
+              ManageUsersInGroup(event: event, removeUser: removeUser, onTap: viewFriendProfile,)
             ],
-          ),
-          ManageUsersInGroup(event: eventUse, removeUser: removeUser, onTap: viewFriendProfile,)
-        ],
+          );
+        }
       ),
     );
   }

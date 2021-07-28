@@ -1,15 +1,18 @@
-import 'dart:async';
-
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:links/screens/auth/authenticate_main.dart';
 import 'package:links/screens/home/home.dart';
+import 'package:links/screens/on_boarding/on_boarding.dart';
 import 'package:provider/provider.dart';
 import 'package:links/screens/alternate/no_connection.dart';
 
 class Wrapper extends StatefulWidget {
+
+  final bool onboarding;
+
+  Wrapper({this.onboarding});
 
   @override
   _WrapperState createState() => _WrapperState();
@@ -36,6 +39,7 @@ class _WrapperState extends State<Wrapper> {
   void initState() {
     super.initState();
     getPermissions();
+
     Connectivity().onConnectivityChanged.listen((result) {
       if(result == ConnectivityResult.wifi || result == ConnectivityResult.mobile){
         setState(() {
@@ -53,7 +57,9 @@ class _WrapperState extends State<Wrapper> {
 
   @override
   Widget build(BuildContext context) {
-
+    if(widget.onboarding){
+      //return OnBoarding();
+    }
     if(online){
       final dynamic user = Provider.of<User>(context);
       if(user == null){

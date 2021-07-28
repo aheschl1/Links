@@ -87,7 +87,6 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  
   collectPayout() async {
     showModalBottomSheet(
       context: context,

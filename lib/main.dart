@@ -32,7 +32,10 @@ void main(){
   WidgetsFlutterBinding.ensureInitialized();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+  bool onboarding = false;
+
   Future<bool> initialzeApp() async {
+    onboarding = await SharedPreferenceService.getOnboardingComplete() ?? true;
     await Firebase.initializeApp();
     await MobileAds.initialize();
     AccountLevels level = await DatabaseService().getAccountLevel();
@@ -68,7 +71,7 @@ void main(){
                 )
               ),
               routes: {
-                '/': (context)=>Wrapper(),
+                '/': (context)=>Wrapper(onboarding: onboarding,),
                 '/settings':(context)=>Settings(),
                 '/view_event':(context)=>EventManagement(),
                 '/view_group':(context)=>GroupManagement(),

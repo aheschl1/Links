@@ -165,11 +165,6 @@ class _MineState extends State<Mine> {
         children: [
           ExpansionTile(
             leading: Icon(Icons.person),
-            onExpansionChanged: (e){
-              setState(() {
-                expansionOpen = e;
-              });
-            },
             title: Text("My Posts"),
             children: [
               FutureBuilder<List<Event>>(
@@ -201,7 +196,7 @@ class _MineState extends State<Mine> {
                   }else{
                     return SizedBox(
                       height: 80,
-                        child: SpinKitCircle(
+                        child: SpinKitFoldingCube(
                             color:Colors.black
                         )
                     );

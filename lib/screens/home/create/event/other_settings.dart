@@ -132,11 +132,11 @@ class _OtherSettingsAndSaveState extends State<OtherSettingsAndSave> {
                   subtitle: confirmation ? Text("Confirmation required to join") : Text("Join without confirmation"),
                   secondary: confirmation ? Icon(Icons.check_circle_rounded) : Icon(Icons.check_circle_outline_outlined),
                   value: confirmation,
-                  onChanged: (val){
+                  onChanged: free ? (val){
                     setState(() {
                       confirmation = val;
                     });
-                  }
+                  } : null
               ),
               SizedBox(height: 8,),
               SwitchListTile(
@@ -147,6 +147,9 @@ class _OtherSettingsAndSaveState extends State<OtherSettingsAndSave> {
                   value: free,
                   onChanged: accountLevelStatus == AccountLevels.BASIC || accountLevelStatus == null ? null : (val){
                     setState(() {
+                      if(!val){
+                        confirmation = false;
+                      }
                       free = val;
                     });
                   }

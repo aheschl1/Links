@@ -31,5 +31,16 @@ class SharedPreferenceService{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return await prefs.setInt('level', AccountLevels.values.indexOf(level));
   }
-  
+
+  static Future<bool> getOnboardingComplete() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool complete = prefs.getBool('onnboardingcomplete');
+    return complete;
+  }
+
+  static Future<bool> setOnboardingComplete(bool complete) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return await prefs.setBool('onnboardingcomplete', complete);
+  }
+
 }

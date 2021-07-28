@@ -67,10 +67,16 @@ class DatabaseService {
   Future<Event> getOneTimeEvent(String documentId) async {
     Event event = Event();
     DocumentSnapshot docOf = await events.doc(documentId).get();
+    if(docOf.exists){
+      event = Event.fromMap(docOf.data());
+      event.docId = docOf.id;
+      return event;
+    }
+    return null;
+  }
 
-    event = Event.fromMap(docOf.data());
-    event.docId = docOf.id;
-    return event;
+  Stream<Event> getEventStream(Event event) {
+    return events.doc(event.docId).snapshots().map((event) => Event.fromMap(event.data()));
   }
 
   Future<Event> getOneTimeGroupEvent(Group group, String documentId) async {
@@ -1289,6 +1295,10 @@ class DatabaseService {
 
     for (String eventId in me.awaitingRequest) {
       Event event = await getOneTimeEvent(eventId);
+      if(event == null){
+        clearRequest(eventId);
+        continue;
+      }
       QuerySnapshot snapshot = await events
           .doc(event.docId)
           .collection("requests")
@@ -1374,6 +1384,19 @@ class DatabaseService {
         .update({"decision": Request.DECLINED})
         .then((value) => "Request denied")
         .catchError((onError) => "Something went wrong");
+  }
+
+  Future<String> clearRequest(String id) async {
+    return await users
+        .doc(user.uid)
+        .collection("preferences")
+        .doc("preference save")
+        .update({
+      "awaitingRequest":
+      FieldValue.arrayRemove([id])
+    })
+        .then((value) => "Success")
+        .catchError((e) => "Something went wrong");
   }
 
   Future<String> agknoledgeRequestDecision(Request request) async {
@@ -1570,6 +1593,7 @@ class DatabaseService {
     await firestore.collection('payments')
         .where('paymentRecipient', isEqualTo: user.uid)
         .where('payedOut', isEqualTo: false)
+        .where('locked', isEqualTo: false)
         .get()
         .then((value) {
            for(QueryDocumentSnapshot doc in value.docs){
@@ -1580,13 +1604,19 @@ class DatabaseService {
           print(e);
         });
 
-    return double.parse(amountOwed.toStringAsFixed(2));
+    return double.parse((amountOwed * 0.92).toStringAsFixed(2));
   }
 
   Future<AccountLevels> getAccountLevel() async {
+    if(user == null){
+      return AccountLevels.BASIC;
+    }
     var data = await users.doc(user.uid).collection('level').doc('level').get();
-    AccountLevels level = AccountLevels.values[data.data()['level']];
-    return level;
+    if(data.exists){
+      AccountLevels level = AccountLevels.values[data.data()['level']];
+      return level;
+    }
+    return AccountLevels.BASIC;
   }
 
 }

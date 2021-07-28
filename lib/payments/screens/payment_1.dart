@@ -22,6 +22,7 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
   FriendData me;
 
   startPayment() async {
+
     final request = BraintreeDropInRequest(
       tokenizationKey: 'sandbox_q7zgyn9g_fr7wvkwvcn3mw39z',
       collectDeviceData: true,
@@ -34,6 +35,26 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
         amount: event.admissionPrice,
         displayName: 'Links',
       ),
+    );
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Padding(
+            padding: const EdgeInsets.all(22.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                new CircularProgressIndicator(),
+                SizedBox(width: 18,),
+                new Text("Awaiting payment completion..."),
+              ],
+            ),
+          ),
+        );
+      },
     );
 
     BraintreeDropInResult result = await BraintreeDropIn.start(request);
@@ -50,10 +71,13 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
             'paymentRecipient': event.owner
           });
 
+      Navigator.pop(context);
+
       if (resultHTTP.body != "Error") {
         paymentSuccess(resultHTTP.body);
       }
     } else {
+      Navigator.pop(context);
       print('Selection was canceled.');
     }
   }
@@ -64,6 +88,7 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
 
   joinEvent(Event event) async {
     String result;
+
 
     if(!event.requireConfirmation){
       result = await DatabaseService().joinEvent(event);
@@ -108,7 +133,15 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
           WidgetMyPage(event),
           SizedBox(height: 10,),
           ViewUsersInGroup(event: event, onTap: viewFriendProfile,),
-          Expanded(child:SizedBox()),
+          Spacer(),
+          Text(
+            '8% of this payment will be collected as a transaction fee. If refunded, you will receive 92% back.',
+            style: TextStyle(
+              color: Colors.white24,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 8,),
           Container(
             width: double.infinity,
             height: 50,

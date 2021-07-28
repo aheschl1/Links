@@ -1,5 +1,6 @@
 
 import 'package:geoflutterfire/geoflutterfire.dart';
+import 'package:links/services/database_service.dart';
 
 class Event{
 
@@ -40,6 +41,10 @@ class Event{
     this.tags
   });
 
+
+  get liveUpdate {
+    return DatabaseService().getEventStream(this);
+  }
 
   Map<String, dynamic> toMap() {
 
