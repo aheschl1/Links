@@ -135,7 +135,7 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
           ViewUsersInGroup(event: event, onTap: viewFriendProfile,),
           Spacer(),
           Text(
-            '8% of this payment will be collected as a transaction fee. If refunded, you will receive 92% back.',
+            '8% of this payment will be collected as a transaction fee. If refunded, the balance will be deposited into your Links account. This can be collected from your profile!',
             style: TextStyle(
               color: Colors.white24,
             ),
