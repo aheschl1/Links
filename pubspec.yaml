@@ -47,6 +47,7 @@ dependencies:
   animated_text_kit: ^4.2.1
   google_mobile_ads: ^0.13.0
   native_admob_flutter: ^1.4.0
+  firebase_crashlytics: ^2.1.1
 
 dev_dependencies:
   flutter_test:
