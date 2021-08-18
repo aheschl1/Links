@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_braintree/flutter_braintree.dart';
@@ -119,6 +118,10 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
     Navigator.of(context).pushNamed('/view_profile', arguments: friendData);
   }
 
+  editEvent(){
+    print('edit');
+  }
+
   @override
   Widget build(BuildContext context) {
     event = ModalRoute.of(context).settings.arguments as Event;
@@ -130,7 +133,7 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
       ),
       body: Column(
         children: [
-          WidgetMyPage(event),
+          WidgetMyPage(event, (){editEvent();}),
           SizedBox(height: 10,),
           ViewUsersInGroup(event: event, onTap: viewFriendProfile,),
           Spacer(),

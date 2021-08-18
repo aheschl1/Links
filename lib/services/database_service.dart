@@ -64,6 +64,22 @@ class DatabaseService {
         .catchError((error) => print("Failed to add user: $error"));
   }
 
+  Future<bool> editEvent(String id, {title, description, tags}) {
+    // Call the user's CollectionReference to add a new user
+    return events
+        .doc(id)
+        .update({
+          'title' : title,
+          'description' : description,
+          'tags' : tags
+        })
+        .then((value) => true)
+        .catchError((error) {
+          print(error);
+          return false;
+        });
+  }
+
   Future<Event> getOneTimeEvent(String documentId) async {
     Event event = Event();
     DocumentSnapshot docOf = await events.doc(documentId).get();
@@ -1573,7 +1589,9 @@ class DatabaseService {
     return await tags.get().then((value) {
       List<Tag> tags = [];
       for (DocumentSnapshot doc in value.docs) {
-        tags.add(Tag.fromMap(doc.data()));
+        Tag tag = Tag.fromMap(doc.data());
+        tag.id = doc.id;
+        tags.add(tag);
       }
       return tags;
     });

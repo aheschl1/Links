@@ -144,7 +144,7 @@ class _MyGroupInState extends State<MyGroupIn> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(0),
+      padding: EdgeInsets.all(8),
       child: Card(
         elevation: 8,
         child: Padding(

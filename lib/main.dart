@@ -7,6 +7,7 @@ import 'package:links/payments/screens/payment_1.dart';
 import 'package:links/screens/chats/groupchat.dart';
 import 'package:links/screens/chats/owner_inbox.dart';
 import 'package:links/screens/chats/private_message.dart';
+import 'package:links/screens/event_managment/edit/edit_event.dart';
 import 'package:links/screens/event_managment/event_managment.dart';
 import 'package:links/screens/group_managment/group_managment.dart';
 import 'package:links/screens/loading.dart';
@@ -81,7 +82,8 @@ void main(){
                 '/payments':(context)=>PaymentMainPage(),
                 '/friends' : (context)=>ManageFriends(),
                 '/view_profile': (context)=>ViewFriend(),
-                '/edit_info' : (context)=>EditNameAndEmail()
+                '/edit_info' : (context)=>EditNameAndEmail(),
+                '/edit_event' : (context)=>EditEvent()
 
               },
               initialRoute: '/',

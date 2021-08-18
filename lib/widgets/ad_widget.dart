@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:links/constants/ad_ids.dart';
 import 'package:native_admob_flutter/native_admob_flutter.dart';
 
 class AdControl extends StatefulWidget {

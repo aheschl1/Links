@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:links/constants/decorations.dart';
 import 'package:links/constants/event.dart';
 import 'package:links/constants/friend_data.dart';
 import 'package:links/constants/group.dart';

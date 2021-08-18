@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:links/constants/event.dart';
 import 'package:links/constants/friend_data.dart';
-import 'package:links/services/database_service.dart';
 import 'package:links/widgets/event_widget.dart';
 import 'package:links/widgets/user_in_group.dart';
 
@@ -47,7 +46,7 @@ class _ManageEventInState extends State<ManageEventIn> {
           Event event = snapshot.data;
           return Column(
             children: [
-              WidgetMyPage(event),
+              WidgetMyPage(event, null),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [

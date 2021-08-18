@@ -1,6 +1,4 @@
-import 'package:geolocator/geolocator.dart';
 import 'package:links/constants/level_types.dart';
-import 'package:links/screens/settings/account_level.dart';
 import 'package:place_picker/place_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

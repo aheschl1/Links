@@ -1,10 +1,7 @@
 
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:links/constants/decorations.dart';
 import 'package:links/constants/event.dart';
 import 'package:links/constants/friend_data.dart';
-import 'package:links/constants/request.dart';
 import 'package:links/screens/loading.dart';
 import 'package:links/services/database_service.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
@@ -25,98 +22,11 @@ class _OwnerInboxState extends State<OwnerInbox> {
     Navigator.of(context).pushNamed('/private_message', arguments: {"event" : event, "to" : data.userId});
   }
 
-  allowRequest(Request request, int index) async {
-    String result = await DatabaseService().allowRequestStatus(event, request);
-    if(result == "Event joined"){
-      result = "Request permitted";
-    }
-    final snackBar = SnackBar(content: Text(result));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    key.currentState.removeItem(index, (context,animation)=>SizedBox());
-  }
-
-  denyRequest(Request request) async {
-    String result = await DatabaseService().denyRequestStatus(event, request);
-    final snackBar = SnackBar(content: Text(result));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
   getAllUserForMessage()async{
     List<FriendData> people = await DatabaseService().getUsersInGroup(event);
     setState(() {
       peopleInGroup = people;
     });
-  }
-
-  showRequests(){
-    showModalBottomSheet(
-      context: context,
-      builder: (context){
-        return FutureBuilder<List<Request>>(
-          future: DatabaseService().getRequests(event),
-          builder: (context, snapshot){
-            if(snapshot.hasError || snapshot.connectionState == ConnectionState.waiting){
-              return SpinKitFoldingCube(color: Colors.white,);
-            }
-            if(snapshot.data.length == 0){
-              return SizedBox(
-                height: double.infinity,
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text(
-                    "No new requests",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 18
-                    ),
-                  ),
-                ),
-              );
-            }
-
-            List<Request> requests = snapshot.data;
-
-            return AnimatedList(
-              key: key,
-              initialItemCount: requests.length,
-              itemBuilder: (context, index, animation){
-
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Dismissible(
-                    key: UniqueKey(),
-                    direction: DismissDirection.endToStart,
-                    background: Container(
-                      padding: EdgeInsets.all(8),
-                      color: Colors.red[400],
-                      alignment: Alignment.centerRight,
-                      child: Icon(
-                        Icons.not_interested_outlined,
-                        size: 30,
-                        color: Colors.white,
-                      ),
-                    ),
-                    onDismissed: (direction)=>denyRequest(requests[index]),
-                    child: ListTile(
-                      trailing: IconButton(
-                        icon: Icon(Icons.check_circle_outline_outlined),
-                        onPressed: ()=>allowRequest(requests[index], index),
-
-                      ),
-                      tileColor: Colors.white24,
-                      title: Text(requests[index].userName),
-                      subtitle: Text(requests[index].userEmail),
-                    ),
-                  ),
-                );
-
-              }
-            );
-
-          },
-        );
-      }
-    );
   }
 
   @override
@@ -131,14 +41,6 @@ class _OwnerInboxState extends State<OwnerInbox> {
     return Scaffold(
       appBar: AppBar(
         title: Text("${event.title} inbox"),
-        actions: event.requireConfirmation == false ? [] : [
-          TextButton.icon(
-
-              icon: Icon(Icons.all_inbox, color: Colors.white),
-              onPressed: ()=>showRequests(),
-              label: Text('Requests', style: TextStyle(color: Colors.white),)
-          )
-        ],
       ),
       body: Column(
         children: [

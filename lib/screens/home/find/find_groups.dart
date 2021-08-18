@@ -30,6 +30,8 @@ class _FindGroupsState extends State<FindGroups> {
 
     if(accountLevelStatus != AccountLevels.BASIC){
       for(var ignored in events){
+        ignored = ignored;
+        ignored = null;
         outline.add(false);
       }
       return outline;

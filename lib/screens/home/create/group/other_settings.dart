@@ -1,12 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:links/constants/event.dart';
 import 'package:links/constants/friend_data.dart';
 import 'package:links/constants/group.dart';
 import 'package:links/constants/tag.dart';
 import 'package:links/services/database_service.dart';
 import 'package:links/widgets/select_friends.dart';
-import 'package:links/widgets/select_tags.dart';
 import 'package:provider/provider.dart';
 
 class OtherSettingsAndSave extends StatefulWidget {

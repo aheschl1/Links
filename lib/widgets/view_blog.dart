@@ -15,6 +15,7 @@ class ViewBlog extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -38,7 +39,7 @@ class ViewBlog extends StatelessWidget {
                   )
                 ],
               ),
-              Divider(height: 20, color: Theme.of(context).cardColor, thickness: 2,),
+              Divider(height: 20, color: Colors.black, thickness: 2,),
               Expanded(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,

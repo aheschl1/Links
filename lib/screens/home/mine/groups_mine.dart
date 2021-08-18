@@ -157,7 +157,7 @@ class _MineGroupsState extends State<MineGroups> {
         children: [
           ExpansionTile(
             leading: Icon(Icons.person),
-            title: Text("My Groups"),
+            title: Text("Groups Created"),
             children: [
               FutureBuilder<List<Group>>(
                 future: DatabaseService().getMyGroupsCreated(),
@@ -201,7 +201,7 @@ class _MineGroupsState extends State<MineGroups> {
           ),
           ExpansionTile(
             leading: Icon(Icons.group),
-            title: Text("Groups In"),
+            title: Text("My Groups"),
             children: [
               FutureBuilder<List<Group>>(
                 future: DatabaseService().getMyGroupsIn(),

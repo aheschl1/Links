@@ -34,7 +34,9 @@ class _FindEventsState extends State<FindEvents> {
    List<bool> outline = [];
 
    if(accountLevelStatus != AccountLevels.BASIC){
-     for(var ignored in events){
+     for(var i in events){
+       i = i;
+       i = null;
        outline.add(false);
      }
      return outline;

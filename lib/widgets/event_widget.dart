@@ -274,7 +274,8 @@ class _MyEventInState extends State<MyEventIn> {
 
 class WidgetMyPage extends StatefulWidget {
   final Event event;
-  WidgetMyPage(this.event);
+  final Function edit;
+  WidgetMyPage(this.event, this.edit);
 
   @override
   _WidgetMyPageState createState() => _WidgetMyPageState();
@@ -304,7 +305,7 @@ class _WidgetMyPageState extends State<WidgetMyPage> {
               )
             ),
           ),
-          Divider(height: 20, color: Colors.black38),
+          Divider(height: 16, color: Colors.black38),
           Text(
             widget.event.description,
             style: TextStyle(
@@ -312,35 +313,40 @@ class _WidgetMyPageState extends State<WidgetMyPage> {
                 fontStyle: FontStyle.italic
             ),
           ),
-          SizedBox(height: 10),
+          SizedBox(height: 8),
           Text(
             "Date: ${widget.event.date}",
             style: TextStyle(
               fontSize: 15,
             ),
           ),
-          SizedBox(height: 10),
+          SizedBox(height: 8),
           Text(
             "From ${widget.event.time} to ${widget.event.endTime}",
             style: TextStyle(
               fontSize: 15,
             ),
           ),
-          SizedBox(height: 10),
+          SizedBox(height: 8),
           Text(
             "Location: ${widget.event.location}",
             style: TextStyle(
               fontSize: 15,
             ),
           ),
-          SizedBox(height: 10),
+          SizedBox(height: 8),
           widget.event.tags != null && widget.event.tags.length > 0 ? Text(
             "Tags: ${formatString(widget.event.tags)}",
             style: TextStyle(
               fontSize: 15,
             ),
           ) : SizedBox(),
-          SizedBox(height: 10),
+          if(widget.edit != null)
+            TextButton.icon(
+              onPressed: widget.edit,
+              label: Text("Edit"),
+              icon: Icon(Icons.edit)
+            ),
         ],
       ),
     );

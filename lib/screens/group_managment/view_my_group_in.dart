@@ -374,7 +374,6 @@ class _ViewMyGroupInState extends State<ViewMyGroupIn> {
                         itemCount: snapshot.data.length,
                         itemBuilder: (context, index){
                           Request request = snapshot.data[index];
-                          User user = FirebaseAuth.instance.currentUser;
                           return ViewRequest(
                             ok: ()=>dismissRequest(request),
                             request: request,

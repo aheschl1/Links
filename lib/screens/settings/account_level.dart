@@ -1,6 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_braintree/flutter_braintree.dart';
 import 'package:links/constants/level_types.dart';
 import 'package:links/screens/settings/account_level_descriptions/basic_description.dart';
 import 'package:links/screens/settings/account_level_descriptions/pro_desciption.dart';
