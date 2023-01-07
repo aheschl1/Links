@@ -52,7 +52,7 @@ class _OwnerInboxState extends State<OwnerInbox> {
               hint: "Start a conversation",
               items: peopleInGroup.map((item){
                 return new DropdownMenuItem(
-                  child: Text(item.name!),
+                  child: Text(item.name),
                   value: item,
                 );
               }
@@ -100,7 +100,7 @@ class _OwnerInboxState extends State<OwnerInbox> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    data.name!,
+                                    data.name,
                                     style: TextStyle(
                                       fontSize: 18
                                     ),
@@ -109,7 +109,7 @@ class _OwnerInboxState extends State<OwnerInbox> {
                                 Padding(
                                   padding: const EdgeInsets.fromLTRB(0, 0, 18, 0),
                                   child: Text(
-                                    data.email!,
+                                    data.email,
                                     style: TextStyle(
                                       fontSize: 13
                                     ),
