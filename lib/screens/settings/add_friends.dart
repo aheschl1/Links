@@ -16,11 +16,15 @@ class _AddFriendsState extends State<AddFriends> {
   Widget noResultsText = Column(
     children: [
       SizedBox(height: 50,),
-      Text(
-        "No search results",
-        style: TextStyle(
-          fontSize: 18,
-          color: Colors.white
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          "No search results. Note that searches are case sensitive.",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 18,
+            color: Colors.white
+          ),
         ),
       ),
     ],
@@ -28,20 +32,17 @@ class _AddFriendsState extends State<AddFriends> {
 
   searchForFriends() async {
 
-    setState(() {
-      friendsToDisplay = [];
-    });
 
     if(searchBar.text.isNotEmpty){
       if(searchBar.text.contains("@")){
-        FriendData? result = await DatabaseService().searchFriendsEmail(searchBar.text);
+        FriendData? result = await DatabaseService().searchFriendsEmail(searchBar.text.trim());
         if(result != null){
           setState(() {
-            friendsToDisplay.add(result);
+            friendsToDisplay = [result];
           });
         }
       }else{
-        List<FriendData>? friends = await DatabaseService().searchFriendsName(searchBar.text);
+        List<FriendData>? friends = await DatabaseService().searchFriendsName(searchBar.text.trim());
         if(friends != null){
           setState(() {
             friendsToDisplay = friends;
@@ -49,6 +50,8 @@ class _AddFriendsState extends State<AddFriends> {
         }
       }
     }
+    searchBar.text = "";
+
 
   }
 
@@ -57,16 +60,14 @@ class _AddFriendsState extends State<AddFriends> {
     final snackBar = SnackBar(content: Text(result),  behavior: SnackBarBehavior.floating,);
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
     if(result != "Something went wrong"){
-      setState(() {
-        friendsToDisplay = [];
-      });
+      Navigator.of(context).pop();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.fromLTRB(8, 100, 8, 8),
       child: Column(
         children: [
           TextField(
@@ -96,7 +97,9 @@ class _AddFriendsState extends State<AddFriends> {
               itemCount: friendsToDisplay.length,
               itemBuilder: (context, index){
                 return AddFriend(
-                  add: ()=>addFriend(friendsToDisplay[index]),
+                  add: (){
+                    addFriend(friendsToDisplay[index]);
+                  },
                   email: friendsToDisplay[index].email,
                   name: friendsToDisplay[index].name,
                 );

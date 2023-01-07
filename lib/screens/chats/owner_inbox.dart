@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:links/constants/event.dart';
 import 'package:links/constants/friend_data.dart';
 import 'package:links/screens/loading.dart';
@@ -24,9 +25,13 @@ class _OwnerInboxState extends State<OwnerInbox> {
 
   getAllUserForMessage()async{
     List<FriendData> people = await DatabaseService().getUsersInGroup(event!);
-    setState(() {
-      peopleInGroup = people;
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      setState(()=>peopleInGroup = people);
     });
+  }
+
+  refresh(){
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) { setState(() {});});
   }
 
   @override
@@ -70,63 +75,59 @@ class _OwnerInboxState extends State<OwnerInbox> {
               future: DatabaseService().getOwnerInbox(event),
               builder: (context, snapshot){
 
-                //if error in testing remove second check
-
-                if(snapshot.connectionState != ConnectionState.done && snapshot.data == null){
-                  return Loading();
+                if(snapshot.connectionState != ConnectionState.done){
+                  return SpinKitFoldingCube(color: Colors.white,);
                 }
 
                 List<FriendData> friends = snapshot.data!;
-
-                return friends.length == 0 ?
-
-                      TextButton.icon(label: Text("No messages"), icon: Icon(Icons.refresh), onPressed: (){setState(() {
-
-                      });},)
-
-                    : ListView.builder(
-                  itemCount: friends.length,
-                  itemBuilder: (context, index){
-                    FriendData data = friends[index];
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Card(
-                        child: InkWell(
-                          onTap: openMessage(data),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    data.name,
-                                    style: TextStyle(
-                                      fontSize: 18
-                                    ),
+                return Builder(builder: (context){
+                  if(friends.length == 0){
+                    return TextButton.icon(label: Text("No messages"), icon: Icon(Icons.refresh), onPressed:refresh());
+                  }else{
+                    return ListView.builder(
+                        itemCount: friends.length,
+                        itemBuilder: (context, index){
+                          FriendData data = friends[index];
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Card(
+                              child: InkWell(
+                                onTap: ()=>openMessage(data),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          data.name,
+                                          style: TextStyle(
+                                              fontSize: 18
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(0, 0, 18, 0),
+                                        child: Text(
+                                          data.email,
+                                          style: TextStyle(
+                                              fontSize: 13
+                                          ),
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.message,
+                                        color: Theme.of(context).accentColor,
+                                      )
+                                    ],
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(0, 0, 18, 0),
-                                  child: Text(
-                                    data.email,
-                                    style: TextStyle(
-                                      fontSize: 13
-                                    ),
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.message,
-                                  color: Theme.of(context).accentColor,
-                                )
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
-                    );
-                  });
-
+                          );
+                        });
+                  }
+                });
               },
             ),
           ),

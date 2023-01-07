@@ -22,7 +22,7 @@ class _MineGroupsState extends State<MineGroups> {
     Navigator.of(context).pushNamed('/view_group', arguments: group);
   }
   getMe()async{
-    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid));
+    me = await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid);
   }
 
   deleteGroup(Group group) async {

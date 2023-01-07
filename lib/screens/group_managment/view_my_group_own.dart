@@ -33,13 +33,15 @@ class _MyGroupOwnState extends State<MyGroupOwn> {
 
   FriendData? me;
   final key = GlobalKey<AnimatedListState>();
+  Stream<Group>? group_stream;
+  Group? group_live;
 
   managePeople(){
     showModalBottomSheet(
       context: context,
       builder: (context){
         return ManageUsers(
-          group: widget.group,
+          group: group_live ?? widget.group,
           removeUser: removeUser,
           onTap: viewFriendProfile,
         );
@@ -90,7 +92,7 @@ class _MyGroupOwnState extends State<MyGroupOwn> {
     });
   }
   openGroupchat(){
-    Navigator.of(context).pushNamed('/groupchat', arguments: widget.group);
+    Navigator.of(context).pushNamed('/groupchat', arguments: group_live ?? widget.group);
   }
 
   openEvent(Event event){
@@ -300,7 +302,7 @@ class _MyGroupOwnState extends State<MyGroupOwn> {
   }
 
   getMe()async{
-    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid));
+    me = await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid);
   }
 
   dismissRequest(Request request) async {
@@ -338,6 +340,15 @@ class _MyGroupOwnState extends State<MyGroupOwn> {
   }
 
   @override
+  void initState() {
+    group_stream = widget.group.liveUpdate;
+    group_stream!.listen((event) {
+      group_live = event;
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     getMe();
@@ -368,7 +379,7 @@ class _MyGroupOwnState extends State<MyGroupOwn> {
         ],
       ),
       body: StreamBuilder<Object>(
-        stream: widget.group.liveUpdate,
+        stream: group_stream!,
         builder: (context, snapshot) {
 
           if(snapshot.connectionState == ConnectionState.waiting){

@@ -36,6 +36,8 @@ class _ViewMyGroupInState extends State<ViewMyGroupIn> {
   viewFriendProfile(FriendData friendData){
     Navigator.of(context).pushNamed('/view_profile', arguments: friendData);
   }
+  Stream<Group>? group_stream;
+  Group? group_live;
 
   createNewEvent() async {
     await showModalBottomSheet(
@@ -46,7 +48,7 @@ class _ViewMyGroupInState extends State<ViewMyGroupIn> {
           appBar: AppBar(
             title: Text("Create event for group"),
           ),
-          body: Create(group: widget.group, changeIndex: (int x){},),
+          body: Create(group: group_live ?? widget.group, changeIndex: (int x){},),
         )
     ).then((value) {
       setState(() {
@@ -74,7 +76,7 @@ class _ViewMyGroupInState extends State<ViewMyGroupIn> {
         context: context,
         builder: (context){
           return ViewUsers(
-            group: widget.group,
+            group: group_live ?? widget.group,
             onTap: viewFriendProfile,
           );
         }
@@ -82,7 +84,7 @@ class _ViewMyGroupInState extends State<ViewMyGroupIn> {
   }
 
   openGroupchat(){
-    Navigator.of(context).pushNamed('/groupchat', arguments: widget.group);
+    Navigator.of(context).pushNamed('/groupchat', arguments: group_live ?? widget.group);
   }
 
   notInterestedInEvent(Event event) async{
@@ -182,7 +184,7 @@ class _ViewMyGroupInState extends State<ViewMyGroupIn> {
 
 
   getMe()async{
-    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid));
+    me = await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid);
   }
 
   joinEvent(Event event) async {
@@ -245,6 +247,16 @@ class _ViewMyGroupInState extends State<ViewMyGroupIn> {
 
   }
 
+
+  @override
+  void initState() {
+    group_stream = widget.group.liveUpdate;
+    group_stream!.listen((event) {
+      group_live = event;
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -276,7 +288,7 @@ class _ViewMyGroupInState extends State<ViewMyGroupIn> {
         ],
       ) : null,
       body: StreamBuilder<Group>(
-        stream: widget.group.liveUpdate,
+        stream: group_stream!,
         builder: (context, snapshot) {
 
           if(snapshot.connectionState == ConnectionState.waiting){

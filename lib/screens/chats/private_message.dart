@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:links/constants/event.dart';
 import 'package:links/constants/friend_data.dart';
 import 'package:links/constants/message.dart';
@@ -56,7 +57,7 @@ class _PrivateMessageState extends State<PrivateMessage> {
   }
 
   getMyUserData() async {
-    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid));
+    me = await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid);
     me!.userId = FirebaseAuth.instance.currentUser!.uid;
   }
 
@@ -80,7 +81,7 @@ class _PrivateMessageState extends State<PrivateMessage> {
           }
 
           if(snapshot.connectionState == ConnectionState.waiting){
-            return Loading();
+            return SpinKitFoldingCube(color: Colors.white,);
           }
 
           return Scaffold(

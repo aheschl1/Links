@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:links/constants/event.dart';
 
@@ -76,14 +75,14 @@ class _EventWidgetState extends State<EventWidget> {
               Row(
                 children: [
                   TextButton.icon(
-                      onPressed:()=>widget.join,
+                      onPressed:widget.join,
                       icon: Icon(Icons.event_available),
                       label: Text(
                           widget.event.requireConfirmation!=null && widget.event.requireConfirmation! ? "Request" : double.parse(widget.event.admissionPrice!) > 0 ? "Join ${widget.event.admissionPrice}\$" : "Join"
                       ),
                   ),
                   TextButton.icon(
-                    onPressed: ()=>widget.notInterested,
+                    onPressed: widget.notInterested,
                     icon: Icon(Icons.event_busy_rounded),
                     label: Text("Not interested"),
                   )
@@ -253,12 +252,12 @@ class _MyEventInState extends State<MyEventIn> {
               Row(
                 children: [
                   TextButton.icon(
-                    onPressed:()=> widget.leaveEvent,
+                    onPressed: widget.leaveEvent,
                     icon: Icon(Icons.exit_to_app),
                     label: Text("Leave"),
                   ),
                   TextButton.icon(
-                    onPressed: ()=>widget.more,
+                    onPressed: widget.more,
                     icon: Icon(Icons.add),
                     label: Text("More"),
                   ),

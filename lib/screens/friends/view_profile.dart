@@ -72,7 +72,7 @@ class _ViewFriendState extends State<ViewFriend> {
   }
 
   getMe()async{
-    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid));
+    me = await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid);
   }
 
   followPerson(FriendData friendData) async {

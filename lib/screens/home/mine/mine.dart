@@ -140,7 +140,7 @@ class _MineState extends State<Mine> {
   }
 
   getMe()async{
-    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid));
+    me = await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid);
   }
 
   dismissRequest(Request request) async {

@@ -169,12 +169,12 @@ class _MyGroupInState extends State<MyGroupIn> {
               Row(
                 children: [
                   TextButton.icon(
-                    onPressed: ()=>widget.leaveGroup,
+                    onPressed: widget.leaveGroup,
                     icon: Icon(Icons.exit_to_app),
                     label: Text("Leave"),
                   ),
                   TextButton.icon(
-                    onPressed: ()=>widget.more,
+                    onPressed: widget.more,
                     icon: Icon(Icons.add),
                     label: Text("More"),
                   ),
@@ -232,14 +232,14 @@ class _GroupWidgetState extends State<GroupWidget> {
               Row(
                 children: [
                   TextButton.icon(
-                    onPressed: ()=>widget.join,
+                    onPressed: widget.join,
                     icon: Icon(Icons.event_available),
                     label: Text(
                         widget.group.requireConfirmation!? "Request" : "Join"
                     ),
                   ),
                   TextButton.icon(
-                    onPressed: ()=>widget.notInterested,
+                    onPressed: widget.notInterested,
                     icon: Icon(Icons.event_busy_rounded),
                     label: Text("Not interested"),
                   )

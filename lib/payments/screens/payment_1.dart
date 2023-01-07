@@ -111,7 +111,7 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
 
   }
   getMe()async{
-    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid));
+    me = await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid);
   }
 
   viewFriendProfile(FriendData friendData){

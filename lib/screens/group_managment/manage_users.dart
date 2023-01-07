@@ -25,10 +25,16 @@ class _ManageUsersState extends State<ManageUsers> {
             future: DatabaseService().getUsersInGroupp(widget.group),
             builder: (context, snapshot){
               if(snapshot.connectionState == ConnectionState.done){
-                return snapshot.data!.length == 0 ? SizedBox(height:300,child:
-                Text("Nobody is in this group yet",
-                style: TextStyle(fontSize: 20, ), textAlign: TextAlign.center,)
-                ) : SizedBox(
+                if (snapshot.data!.length == 0) {
+                  return SizedBox(height:300,child:
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("Nobody is in this group yet",
+                        style: TextStyle(fontSize: 20, ), textAlign: TextAlign.center,),
+                    )
+                    );
+                } else {
+                  return SizedBox(
                   height: 300,
                   child: ListView.builder(
                       itemCount: snapshot.data!.length,
@@ -60,6 +66,7 @@ class _ManageUsersState extends State<ManageUsers> {
                       }
                   ),
                 );
+                }
               }else{
                 return SizedBox(
                     height: 300,

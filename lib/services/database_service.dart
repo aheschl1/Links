@@ -886,9 +886,11 @@ class DatabaseService {
     return UserData.fromMap(userPage.data() as Map);
   }
 
-  Future<Map> getUser(String uid) async {
+  Future<FriendData> getUser(String uid) async {
     DocumentSnapshot doc = await users.doc(uid).get();
-    return doc.data() as Map;
+    FriendData friend = FriendData.fromMap(doc.data() as Map);
+    friend.userId = uid;
+    return friend;
   }
 
   Future<List<FriendData>> getUserFriends(String uid) async {
@@ -904,9 +906,8 @@ class DatabaseService {
       List userIds = thisUserData.following!;
 
       for (String id in userIds) {
-        Map friendData = await getUser(id);
-        friendData["userId"] = id;
-        userDatas.add(FriendData.fromMap(friendData));
+        FriendData friendData = await getUser(id);
+        userDatas.add(friendData);
       }
 
       return userDatas;
@@ -1064,16 +1065,14 @@ class DatabaseService {
       return usersInReturn;
     }
     for (var userId in event.usersIn!) {
-      Map friendData = await getUser(userId);
-      friendData["userId"] = userId;
+      FriendData friend = await getUser(userId);
       if (userId != user!.uid) {
-        usersInReturn.add(FriendData.fromMap(friendData));
+        usersInReturn.add(friend);
       }
     }
     if (event.owner != user!.uid) {
-      Map friendData = await getUser(event.owner);
-      friendData["userId"] = event.owner;
-      usersInReturn.add(FriendData.fromMap(friendData));
+      FriendData friend = await getUser(event.owner);
+      usersInReturn.add(friend);
     }
     return usersInReturn;
   }
@@ -1084,16 +1083,14 @@ class DatabaseService {
       return [];
     }
     for (var userId in group.usersIn!) {
-      Map friendData = await getUser(userId);
-      friendData["userId"] = userId;
+      FriendData friend = await getUser(userId);
       if (userId != user!.uid) {
-        usersInReturn.add(FriendData.fromMap(friendData));
+        usersInReturn.add(friend);
       }
     }
     if (group.owner != user!.uid) {
-      Map friendData = await getUser(group.owner!);
-      friendData["userId"] = group.owner;
-      usersInReturn.add(FriendData.fromMap(friendData));
+      FriendData friend = await getUser(group.owner!);
+      usersInReturn.add(friend);
     }
     return usersInReturn;
   }
@@ -1173,8 +1170,7 @@ class DatabaseService {
     }
 
     for (String id in userMessages) {
-      FriendData data = FriendData.fromMap(await getUser(id));
-      data.userId = id;
+      FriendData data = await getUser(id);
       friends.add(data);
     }
 

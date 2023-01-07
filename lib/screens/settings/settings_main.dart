@@ -28,9 +28,9 @@ class _SettingsState extends State<Settings> {
   void getMyData() async {
     String uid = FirebaseAuth.instance.currentUser!.uid;
     UserData? data = await DatabaseService().getUserPreferences(uid);
-    Map map = await DatabaseService().getUser(uid);
+    FriendData metemp = await DatabaseService().getUser(uid);
     setState(() {
-      me = FriendData.fromMap(map);
+      me = metemp;
       myData = data;
     });
   }
@@ -65,8 +65,8 @@ class _SettingsState extends State<Settings> {
   addFriends(){
     showModalBottomSheet(
       context: context,
+        isScrollControlled: true,
         builder: (context) => Container(
-          height: 1500,
           width: double.infinity,
           child: AddFriends()
       ),
