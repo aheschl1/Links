@@ -23,6 +23,8 @@
 /android/app/src/main/AndroidManifest.xml
 /android/app/google-services.json
 /ios/Runner/AppDelegate.swift
+/ios/GoogleService-Info.plist
+
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
