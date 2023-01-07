@@ -101,9 +101,9 @@ class _ManageFriendsState extends State<ManageFriends> {
                           padding: EdgeInsets.all(8),
                           child: Row(
                             children: [
-                              Text(snapshot.data![index].name!),
+                              Text(snapshot.data![index].name),
                               SizedBox(width: 18,),
-                              Text(snapshot.data![index].email!),
+                              Text(snapshot.data![index].email),
                               Spacer(),
                               TextButton.icon(
                                   onPressed: (){

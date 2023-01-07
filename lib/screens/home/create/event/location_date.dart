@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:intl/intl.dart';
+import 'package:links/constants/api_keys.dart';
 import 'package:links/constants/event.dart';
 import 'package:place_picker/place_picker.dart';
 
@@ -23,7 +24,7 @@ class _EnterLocationAndDateState extends State<EnterLocationAndDate> {
   String currentEndTime = "1:00 PM";
   GeoFirePoint? point;
 
-  final kGoogleApiKey = "AIzaSyDQsi3TnwIWsNl_IJs63sIzw__418mSlKE";
+  final kGoogleApiKey = ApiKeys.GOOGLE_MAP_API;
   final _formKey = GlobalKey<FormState>();
 
   done(){
