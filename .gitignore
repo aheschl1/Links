@@ -19,10 +19,10 @@
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
 .vscode/
-lib/constants/api_keys.dart
-android/app/src/main/AndroidManifest.xml
-android/app/google-services.json
-ios/Runner/AppDelegate.swift
+/lib/constants/api_keys.dart
+/android/app/src/main/AndroidManifest.xml
+/android/app/google-services.json
+/ios/Runner/AppDelegate.swift
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
