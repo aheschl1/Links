@@ -4,9 +4,9 @@ import 'package:links/constants/request.dart';
 class ViewRequest extends StatefulWidget {
 
   final Request request;
-  final Function ok;
+  final Function()? ok;
 
-  ViewRequest({this.request, this.ok});
+  ViewRequest({required this.request, required this.ok});
 
   @override
   _ViewRequestState createState() => _ViewRequestState();
@@ -14,7 +14,7 @@ class ViewRequest extends StatefulWidget {
 
 class _ViewRequestState extends State<ViewRequest> {
 
-  String requestStatus;
+  String? requestStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -38,20 +38,20 @@ class _ViewRequestState extends State<ViewRequest> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(widget.request.eventAttached.title, style: TextStyle(
+              Text(widget.request.eventAttached!.title, style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
               )),
               SizedBox(height: 5),
               Text(
-                "Date: ${widget.request.eventAttached.date}",
+                "Date: ${widget.request.eventAttached!.date}",
                 style: TextStyle(
                   fontSize: 15,
                 ),
               ),
               SizedBox(height: 5),
               Text(
-                "Location: ${widget.request.eventAttached.location}",
+                "Location: ${widget.request.eventAttached!.location}",
                 style: TextStyle(
                   fontSize: 15,
                 ),
@@ -61,13 +61,13 @@ class _ViewRequestState extends State<ViewRequest> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    requestStatus,
+                    requestStatus??"",
                     style: TextStyle(
                       fontSize: 15,
                       color: widget.request.decision == Request.PENDING ? Colors.green : Colors.red
                     ),
                   ),
-                  IconButton(icon: Icon(Icons.remove_circle_outline_rounded), onPressed: widget.ok)
+                  IconButton(icon: Icon(Icons.remove_circle_outline_rounded), onPressed: ()=>widget.ok)
                 ],
               )
             ],
@@ -81,9 +81,9 @@ class _ViewRequestState extends State<ViewRequest> {
 class ViewRequestGroup extends StatefulWidget {
 
   final Request request;
-  final Function ok;
+  final Function()? ok;
 
-  ViewRequestGroup({this.request, this.ok});
+  ViewRequestGroup({required this.request, required this.ok});
 
   @override
   _ViewRequestGroupState createState() => _ViewRequestGroupState();
@@ -91,7 +91,7 @@ class ViewRequestGroup extends StatefulWidget {
 
 class _ViewRequestGroupState extends State<ViewRequestGroup> {
 
-  String requestStatus;
+  String? requestStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +115,7 @@ class _ViewRequestGroupState extends State<ViewRequestGroup> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(widget.request.groupAttached.name, style: TextStyle(
+              Text(widget.request.groupAttached!.name, style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
               )),
@@ -124,13 +124,13 @@ class _ViewRequestGroupState extends State<ViewRequestGroup> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    requestStatus,
+                    requestStatus??"",
                     style: TextStyle(
                         fontSize: 15,
                         color: widget.request.decision == Request.PENDING ? Colors.green : Colors.red
                     ),
                   ),
-                  IconButton(icon: Icon(Icons.remove_circle_outline_rounded), onPressed: widget.ok)
+                  IconButton(icon: Icon(Icons.remove_circle_outline_rounded), onPressed: ()=>widget.ok)
                 ],
               )
             ],

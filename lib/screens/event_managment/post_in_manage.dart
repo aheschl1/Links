@@ -7,7 +7,7 @@ import 'package:links/widgets/user_in_group.dart';
 
 class ManageEventIn extends StatefulWidget {
 
-  final Event event;
+  final Event? event;
 
   ManageEventIn({this.event});
 
@@ -36,17 +36,17 @@ class _ManageEventInState extends State<ManageEventIn> {
         title: Text("My Link"),
       ),
       body: StreamBuilder<Event>(
-        stream: widget.event.liveUpdate,
+        stream: widget.event!.liveUpdate!,
         builder: (context, snapshot) {
           if(snapshot.connectionState == ConnectionState.waiting){
             return Center(
               child: SpinKitFoldingCube(color: Colors.white,),
             );
           }
-          Event event = snapshot.data;
+          Event? event = snapshot.data;
           return Column(
             children: [
-              WidgetMyPage(event, null),
+              WidgetMyPage(event!, null),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [

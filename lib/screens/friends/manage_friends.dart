@@ -39,12 +39,18 @@ class _ManageFriendsState extends State<ManageFriends> {
       body: Container(
         padding: EdgeInsets.all(8),
         child: FutureBuilder<List<FriendData>>(
-          future: DatabaseService().getUserFriends(FirebaseAuth.instance.currentUser.uid),
+          future: DatabaseService().getUserFriends(FirebaseAuth.instance.currentUser!.uid),
           builder: (context, snapshot){
             if(snapshot.connectionState == ConnectionState.done){
 
-              List<FriendData> friends = snapshot.data;
-
+              List<FriendData> friends = snapshot.data!;
+              if(friends.isEmpty){
+                return Center(
+                  child: Text(
+                    "Looks like you don't have any friends yet"
+                  ),
+                );
+              }
               return AnimatedList(
                 key: key,
                 initialItemCount: friends.length,
@@ -95,14 +101,14 @@ class _ManageFriendsState extends State<ManageFriends> {
                           padding: EdgeInsets.all(8),
                           child: Row(
                             children: [
-                              Text(snapshot.data[index].name),
+                              Text(snapshot.data![index].name!),
                               SizedBox(width: 18,),
-                              Text(snapshot.data[index].email),
+                              Text(snapshot.data![index].email!),
                               Spacer(),
                               TextButton.icon(
                                   onPressed: (){
                                     removeFriend(friends[index]);
-                                    key.currentState.removeItem(index, (context,animation)=>SizedBox());
+                                    key.currentState!.removeItem(index, (context,animation)=>SizedBox());
                                   },
                                   icon: Icon(Icons.person_remove),
                                   label: Text("Remove")

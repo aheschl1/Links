@@ -1,14 +1,13 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:links/screens/home/create/event/create.dart';
 import 'package:links/screens/home/create/group/create.dart';
 
 class CreateWrapper extends StatefulWidget {
 
-  final Function changeIndex;
+  final Function(int) changeIndex;
 
-  CreateWrapper({this.changeIndex});
+  CreateWrapper({required this.changeIndex});
 
   @override
   _CreateWrapperState createState() => _CreateWrapperState();

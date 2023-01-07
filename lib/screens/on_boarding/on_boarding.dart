@@ -3,7 +3,7 @@ import 'package:links/screens/on_boarding/stage_1.dart';
 import 'package:links/screens/on_boarding/stage_two.dart';
 
 class OnBoarding extends StatefulWidget {
-  const OnBoarding({Key key}) : super(key: key);
+  const OnBoarding({Key? key}) : super(key: key);
 
   @override
   _OnBoardingState createState() => _OnBoardingState();

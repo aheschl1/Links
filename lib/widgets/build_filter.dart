@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
+import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:intl/intl.dart';
 import 'package:place_picker/entities/location_result.dart';
 import 'package:place_picker/widgets/place_picker.dart';
@@ -9,10 +9,10 @@ class FilterSearch extends StatefulWidget {
 
   final DateTime startDate;
   final DateTime endDate;
-  final GeoFirePoint position;
+  final GeoFirePoint? position;
   final double radius;
 
-  FilterSearch({this.startDate, this.endDate, this.position, this.radius});
+  FilterSearch({required this.startDate, required this.endDate, required this.position, required this.radius});
 
   @override
   _FilterSearchState createState() => _FilterSearchState();
@@ -20,13 +20,13 @@ class FilterSearch extends StatefulWidget {
 
 class _FilterSearchState extends State<FilterSearch> {
 
-  final kGoogleApiKey = "AIzaSyDavOnmlKHv2dKYcPmxoNCMnl9foHeKftY";
-  DateTime newStartDate;
-  DateTime newEndDate;
-  GeoFirePoint newPosition;
-  double newRadius;
+  final kGoogleApiKey = "AIzaSyDQsi3TnwIWsNl_IJs63sIzw__418mSlKE";
+  DateTime? newStartDate;
+  DateTime? newEndDate;
+  GeoFirePoint? newPosition;
+  double? newRadius;
 
-  String address;
+  String? address;
 
   searchLocation() async {
     LocationResult result = await Navigator.of(context).push(MaterialPageRoute(
@@ -36,13 +36,13 @@ class _FilterSearchState extends State<FilterSearch> {
     // Handle the result in your way
     setState(() {
       address = result.formattedAddress;
-      newPosition = Geoflutterfire().point(latitude: result.latLng.latitude, longitude:  result.latLng.longitude);
+      newPosition = GeoFlutterFire().point(latitude: result.latLng!.latitude, longitude:  result.latLng!.longitude);
     });
 
   }
 
   selectDateRange()async{
-    DateTimeRange range = await showDateRangePicker(
+    DateTimeRange? range = await showDateRangePicker(
       context: context,
       firstDate: DateTime.now(),
       lastDate: DateTime(DateTime.now().year + 1, DateTime.now().month, DateTime.now().day),
@@ -61,21 +61,20 @@ class _FilterSearchState extends State<FilterSearch> {
 
     DateFormat formattedDate = DateFormat.yMMMEd();
 
-    String startDateShow = formattedDate.format(newStartDate == null ? widget.startDate : newStartDate);
-    String endDateShow = formattedDate.format(newEndDate == null ? widget.endDate : newEndDate);
+    String startDateShow = formattedDate.format(newStartDate == null ? widget.startDate : newStartDate!);
+    String endDateShow = formattedDate.format(newEndDate == null ? widget.endDate : newEndDate!);
 
     return Container(
       padding: EdgeInsets.all(8),
       child: Column(
         children: [
           TextButton.icon(
-            label: Flexible(
-              child: Text(
-                address == null ? "Change search location" : "Filter events near $address",
-                style: TextStyle(
-                  color: Colors.white
-                ),
-              )
+            label: Text(
+              address == null ? "Change search location" : "Filter events near $address",
+              overflow: TextOverflow.fade,
+              style: TextStyle(
+                color: Colors.white
+              ),
             ),
             icon: Icon(Icons.map),
             onPressed: ()=>searchLocation(),
@@ -87,7 +86,7 @@ class _FilterSearchState extends State<FilterSearch> {
           Slider(
             min: 1,
             max: 100,
-            value: newRadius == null ? widget.radius : newRadius,
+            value: newRadius == null ? widget.radius : newRadius!,
             onChanged: (value){
               setState(() {
                 newRadius = double.parse(value.toStringAsFixed(1));
@@ -96,12 +95,10 @@ class _FilterSearchState extends State<FilterSearch> {
           ),
           Divider(height: 20,),
           TextButton.icon(
-            label: Flexible(
-              child: Text(
-                "Filter events between the dates $startDateShow and $endDateShow",
-                style: TextStyle(
-                    color: Colors.white
-                ),
+            label: Text(
+              "Filter events between the dates $startDateShow and $endDateShow",
+              style: TextStyle(
+                  color: Colors.white
               ),
             ),
             icon: Icon(Icons.date_range),

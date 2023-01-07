@@ -6,7 +6,7 @@ import 'package:links/constants/message.dart';
 class MessageView extends StatefulWidget {
 
   final Message message;
-  MessageView({this.message});
+  MessageView({required this.message});
 
   @override
   _MessageViewState createState() => _MessageViewState();
@@ -39,7 +39,7 @@ class _MessageViewState extends State<MessageView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "${widget.message.senderUid != FirebaseAuth.instance.currentUser.uid ? widget.message.senderDisplayName : "Me" } : " ,
+                "${widget.message.senderUid != FirebaseAuth.instance.currentUser!.uid ? widget.message.senderDisplayName : "Me" } : " ,
                 style: TextStyle(
                   fontSize: 18,
                 ),

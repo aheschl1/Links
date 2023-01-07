@@ -6,9 +6,9 @@ import 'package:provider/provider.dart';
 class SelectFriends extends StatefulWidget {
 
   final bool hide;
-  final Function onChanged;
+  final Function(List<FriendData>) onChanged;
 
-  SelectFriends({this.hide = false, this.onChanged(List<FriendData> data)});
+  SelectFriends({this.hide = false, required this.onChanged(List<FriendData> data)});
 
   @override
   _SelectFriendsState createState() => _SelectFriendsState();
@@ -29,7 +29,7 @@ class _SelectFriendsState extends State<SelectFriends> {
       listType: MultiSelectListType.CHIP,
       onConfirm: (values) {
         selectedPeople = values;
-        widget.onChanged(selectedPeople);
+        widget.onChanged(selectedPeople as List<FriendData>);
       },
     );
 

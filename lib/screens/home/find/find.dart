@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:intl/intl.dart';
 import 'package:links/constants/event.dart';
 import 'package:links/constants/friend_data.dart';
@@ -13,6 +14,7 @@ import 'package:links/services/shared_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:links/widgets/build_filter.dart';
 import 'package:place_picker/place_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class Find extends StatefulWidget {
   @override
@@ -24,27 +26,48 @@ class _FindState extends State<Find>{
   static const int EVENT = 0;
   static const int GROUP = 1;
 
-  GeoFirePoint _currentPosition;
-  String address;
+  GeoFirePoint? _currentPosition;
+  String? address;
   double radius = 40.0;
 
   var startDate = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   DateTime endDate = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day + 7);
 
-  FriendData me;
+  FriendData? me;
 
   int currentFinding = EVENT;
+
+  void getLocationPermission () async{
+    PermissionStatus status = await Permission.location.status;
+    if (status.isDenied) {
+      Permission.location.request().then((value)async{
+        if(status.isDenied && await Permission.locationWhenInUse.serviceStatus.isDisabled){
+          final snackBar = SnackBar(
+            content: Text("Links is better with location"),
+            behavior: SnackBarBehavior.floating, // Add this line
+          );
+          ScaffoldMessenger.of(context).showSnackBar(
+            snackBar,
+          );
+        }else{
+          setState(() {
+            _getCurrentLocation();
+          });
+        }
+      });
+    }
+  }
 
   joinEvent(Event event) async {
     String result;
 
-    if(double.parse(event.admissionPrice) > 0){
+    if(double.parse(event.admissionPrice!) > 0){
       Navigator.of(context).pushNamed("/payments", arguments: event);
     }else{
-      if(!event.requireConfirmation){
+      if(event.requireConfirmation == null || !event.requireConfirmation!){
         result = await DatabaseService().joinEvent(event);
       }else{
-        Request request = Request(userId: FirebaseAuth.instance.currentUser.uid, decision: Request.PENDING, userEmail: me.email, userName: me.name);
+        Request request = Request(userId: FirebaseAuth.instance.currentUser!.uid, decision: Request.PENDING, userEmail: me!.email, userName: me!.name);
         result = await DatabaseService().requestToJoin(event, request);
       }
 
@@ -54,7 +77,6 @@ class _FindState extends State<Find>{
       );
       ScaffoldMessenger.of(context).showSnackBar(
           snackBar,
-
       );
 
     }
@@ -74,10 +96,10 @@ class _FindState extends State<Find>{
     String result;
 
 
-    if(!group.requireConfirmation){
+    if(!group.requireConfirmation!){
       result = await DatabaseService().joinGroup(group);
     }else{
-      Request request = Request(userId: FirebaseAuth.instance.currentUser.uid, decision: Request.PENDING, userEmail: me.email, userName: me.name);
+      Request request = Request(userId: FirebaseAuth.instance.currentUser!.uid, decision: Request.PENDING, userEmail: me!.email, userName: me!.name);
       result = await DatabaseService().requestToJoinGroup(group, request);
     }
 
@@ -102,20 +124,16 @@ class _FindState extends State<Find>{
   }
 
   getMe()async{
-    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser.uid));
+    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid));
   }
 
-  _getCurrentLocation() {
+  _getCurrentLocation() async {
     Geolocator
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
         .then((Position position) {
-
           SharedPreferenceService.setLocation(LatLng(position.latitude, position.longitude));
-
-          setState(() {
-            _currentPosition = GeoFirePoint(position.latitude, position.longitude);
-            address = "my location";
-          });
+          _currentPosition = GeoFirePoint(position.latitude, position.longitude);
+          address = "my location";
     }).catchError((e) {
       print(e);
     });
@@ -128,7 +146,6 @@ class _FindState extends State<Find>{
       ).then(
         (value){
           if(value != null){
-            print(value);
             setState(() {
               _currentPosition = value['position'] == null ? _currentPosition : value['position'];
               startDate = value['startDate'] == null ? startDate : value['startDate'];
@@ -141,10 +158,11 @@ class _FindState extends State<Find>{
     );
   }
 
+
   @override
   void initState() {
+    getLocationPermission();
     super.initState();
-    _getCurrentLocation();
   }
 
   @override
@@ -172,7 +190,7 @@ class _FindState extends State<Find>{
               )).toList(),
               onChanged: (e){
                 setState(() {
-                  currentFinding = e;
+                  currentFinding = e as int;
                 });
               },
             ),
@@ -218,13 +236,21 @@ class _FindState extends State<Find>{
           child: Divider(height: 15,),
         ),
         //start content,
-        currentFinding == EVENT ? FindEvents(
-          radius: radius,
-          currentPosition: _currentPosition,
-          endDate: endDate,
-          startDate: startDate,
-          joinEvent: (e)=>joinEvent(e),
-          notInterestedInEvent: (e)=>notInterestedInEvent(e),
+        currentFinding == EVENT ? FutureBuilder(
+          future: _getCurrentLocation(),
+          builder: (context, snapshot) {
+            if(snapshot.connectionState == ConnectionState.waiting){
+              return SpinKitFoldingCube(color:Colors.white);
+            }
+            return FindEvents(
+              radius: radius,
+              currentPosition: _currentPosition,
+              endDate: endDate,
+              startDate: startDate,
+              joinEvent: (e)=>joinEvent(e),
+              notInterestedInEvent: (e)=>notInterestedInEvent(e),
+            );
+          }
         ) : FindGroups(
           joinGroup: (e)=>joinGroup(e),
           notInterestedInGroup: (e)=>notInterestedInGroup(e),

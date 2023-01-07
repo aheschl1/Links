@@ -22,7 +22,7 @@ class _MineState extends State<Mine> {
 
   bool expansionOpen = false;
   GlobalKey<AnimatedListState> key = GlobalKey<AnimatedListState>();
-  FriendData me;
+  FriendData? me;
 
   deleteEvent(Event event) async {
     bool delete = await showDialog(
@@ -55,7 +55,7 @@ class _MineState extends State<Mine> {
       String result = await DatabaseService().deleteEvent(event);
       if(result == "Deleted successfully"){
         if(event.groupChatEnabledID != null){
-          FirebaseMessaging.instance.unsubscribeFromTopic(event.groupChatEnabledID);
+          FirebaseMessaging.instance.unsubscribeFromTopic(event.groupChatEnabledID!);
         }
       }
       final snackBar = SnackBar(
@@ -94,7 +94,7 @@ class _MineState extends State<Mine> {
     );
 
     if(leave){
-      String result = await DatabaseService().leaveEvent(event.docId);
+      String result = await DatabaseService().leaveEvent(event.docId!);
       final snackBar = SnackBar(
         content: Text(result),
         behavior: SnackBarBehavior.floating, // Add this line
@@ -109,13 +109,13 @@ class _MineState extends State<Mine> {
   joinEvent(Event event) async {
     String result;
 
-    if(double.parse(event.admissionPrice) > 0){
+    if(double.parse(event.admissionPrice!) > 0){
       Navigator.of(context).pushNamed("/payments", arguments: event);
     }else{
-      if(!event.requireConfirmation){
+      if(event.requireConfirmation == null || !event.requireConfirmation!){
         result = await DatabaseService().joinEvent(event);
       }else{
-        Request request = Request(userId: FirebaseAuth.instance.currentUser.uid, decision: Request.PENDING, userEmail: me.email, userName: me.name);
+        Request request = Request(userId: FirebaseAuth.instance.currentUser!.uid, decision: Request.PENDING, userEmail: me!.email, userName: me!.name);
         result = await DatabaseService().requestToJoin(event, request);
       }
 
@@ -140,7 +140,7 @@ class _MineState extends State<Mine> {
   }
 
   getMe()async{
-    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser.uid));
+    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid));
   }
 
   dismissRequest(Request request) async {
@@ -161,7 +161,9 @@ class _MineState extends State<Mine> {
     getMe();
 
     return  Container(
-      child: Column(
+      child: ListView(
+        physics: ClampingScrollPhysics(),
+        shrinkWrap: true,
         children: [
           ExpansionTile(
             leading: Icon(Icons.person),
@@ -171,10 +173,9 @@ class _MineState extends State<Mine> {
                 future: DatabaseService().getMyEventsCreated(),
                 builder: (context, snapshot){
 
-                  List<Event> eventsToDisplay = [];
-                  eventsToDisplay = snapshot.data;
-
                   if(snapshot.connectionState == ConnectionState.done){
+                    List<Event> eventsToDisplay = [];
+                    eventsToDisplay = snapshot.data!;
                     return eventsToDisplay.length == 0 ?
                     TextButton.icon(label: Text("You have not posted any events yet"), icon: Icon(Icons.refresh), onPressed: (){setState(() {
 
@@ -218,7 +219,7 @@ class _MineState extends State<Mine> {
                   List<Event> eventsToDisplay = [];
 
                   if(snapshot.connectionState == ConnectionState.done){
-                    eventsToDisplay = snapshot.data;
+                    eventsToDisplay = snapshot.data!;
                     return eventsToDisplay.length == 0 ?
                     TextButton.icon(label: Text("You have not joined any links"), icon: Icon(Icons.refresh), onPressed: (){setState(() {
 
@@ -257,7 +258,7 @@ class _MineState extends State<Mine> {
                 future: DatabaseService().getPrivateEventsToDisplay(15),
                 builder: (context, snapshot){
 
-                  List<Event> eventsToDisplay = [];
+                  List<Event>? eventsToDisplay = [];
 
                   if(snapshot.connectionState == ConnectionState.done){
                     eventsToDisplay = snapshot.data;
@@ -268,10 +269,10 @@ class _MineState extends State<Mine> {
                         : SizedBox(
                       height: 300,
                       child:  AnimatedList(
-                        initialItemCount: eventsToDisplay.length,
+                        initialItemCount: eventsToDisplay!.length,
                         key: key,
                         itemBuilder: (context, int index, animation){
-                          Event event = eventsToDisplay[index];
+                          Event event = eventsToDisplay![index];
                           return Dismissible(
 
                             onDismissed: (direction){
@@ -288,13 +289,13 @@ class _MineState extends State<Mine> {
                               event: event,
                               join: (){
                                 joinEvent(event);
-                                snapshot.data.removeAt(index);
-                                key.currentState.removeItem(index, (context,animation)=>SizedBox());
+                                snapshot.data!.removeAt(index);
+                                key.currentState!.removeItem(index, (context,animation)=>SizedBox());
                               },
                               notInterested: () {
                                 notInterestedInEvent(event);
-                                snapshot.data.removeAt(index);
-                                key.currentState.removeItem(index, (context,animation)=>SizedBox());
+                                snapshot.data!.removeAt(index);
+                                key.currentState!.removeItem(index, (context,animation)=>SizedBox());
                               },
                             ),
 
@@ -350,7 +351,7 @@ class _MineState extends State<Mine> {
                 future: DatabaseService().getRequestsPending(),
                 builder: (context, snapshot){
 
-                  List<Request> requestsToDisplay = [];
+                  List<Request>? requestsToDisplay = [];
 
                   if(snapshot.connectionState == ConnectionState.done){
 
@@ -363,10 +364,10 @@ class _MineState extends State<Mine> {
                         : SizedBox(
                       height: 300,
                       child:  AnimatedList(
-                        initialItemCount: requestsToDisplay.length,
+                        initialItemCount: requestsToDisplay!.length,
                         key: key,
                         itemBuilder: (context, int index, animation){
-                          Request request = requestsToDisplay[index];
+                          Request request = requestsToDisplay![index];
                           return ViewRequest(request: request, ok: ()=>dismissRequest(request));
                         },
                       ),

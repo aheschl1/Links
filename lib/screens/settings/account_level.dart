@@ -7,7 +7,7 @@ import 'package:links/services/database_service.dart';
 class AccountLevel extends StatefulWidget {
   final AccountLevels accountLevelCurrent;
 
-  const AccountLevel({Key key, this.accountLevelCurrent}) : super(key: key);
+  const AccountLevel({Key? key, required this.accountLevelCurrent}) : super(key: key);
 
   @override
   _AccountLevelState createState() => _AccountLevelState();
@@ -15,7 +15,7 @@ class AccountLevel extends StatefulWidget {
 
 class _AccountLevelState extends State<AccountLevel> {
 
-  AccountLevels accountLevelStatus;
+  AccountLevels? accountLevelStatus;
 
 
   void basicLevelClicked(){

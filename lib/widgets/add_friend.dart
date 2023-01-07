@@ -4,9 +4,9 @@ class AddFriend extends StatelessWidget {
 
   final String name;
   final String email;
-  final Function add;
+  final Function()? add;
 
-  AddFriend({this.name, this.email, this.add});
+  AddFriend({required this.name, required this.email, required this.add});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class AddFriend extends StatelessWidget {
               Text(name),
               Text(email),
               SizedBox(width: 18,),
-              IconButton(icon: Icon(Icons.person_add), onPressed: add)
+              IconButton(icon: Icon(Icons.person_add), onPressed: ()=>add)
             ],
           ),
         ),

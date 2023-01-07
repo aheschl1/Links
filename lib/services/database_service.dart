@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
+import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:links/constants/blog_post.dart';
 import 'package:links/constants/event.dart';
 import 'package:links/constants/friend_data.dart';
@@ -18,31 +18,30 @@ class DatabaseService {
   CollectionReference events = FirebaseFirestore.instance.collection('events');
   CollectionReference groups = FirebaseFirestore.instance.collection('groups');
   CollectionReference users = FirebaseFirestore.instance.collection('users');
-  CollectionReference groupChats =
-      FirebaseFirestore.instance.collection('groupchats');
+  CollectionReference groupChats = FirebaseFirestore.instance.collection('groupchats');
   CollectionReference tags = FirebaseFirestore.instance.collection('tags');
 
-  User user = FirebaseAuth.instance.currentUser;
+  User? user = FirebaseAuth.instance.currentUser;
 
   Future<String> addEvent(Event event) async {
     // Call the user's CollectionReference to add a new user
     return await events.add(event.toMap()).then((value) {
       return value.id;
     }).catchError((error) {
-      return null;
+      return "Error";
     });
   }
 
-  Future<String> addEventToGroup(Event event, Group group) async {
+  Future<String> addEventToGroup(Event event, Group? group) async {
     // Call the user's CollectionReference to add a new user
     return await groups
-        .doc(group.docId)
+        .doc(group!.docId)
         .collection('events')
         .add(event.toMap())
         .then((value) {
       return value.id;
     }).catchError((error) {
-      return null;
+      return "Error";
     });
   }
 
@@ -51,7 +50,7 @@ class DatabaseService {
     return await groups.add(group.toMap()).then((value) {
       return value.id;
     }).catchError((error) {
-      return null;
+      return "Error";
     });
   }
 
@@ -75,16 +74,15 @@ class DatabaseService {
         })
         .then((value) => true)
         .catchError((error) {
-          print(error);
           return false;
         });
   }
 
-  Future<Event> getOneTimeEvent(String documentId) async {
-    Event event = Event();
+  Future<Event?> getOneTimeEvent(String documentId) async {
+    Event? event;
     DocumentSnapshot docOf = await events.doc(documentId).get();
     if(docOf.exists){
-      event = Event.fromMap(docOf.data());
+      event = Event.fromMap(docOf.data() as Map);
       event.docId = docOf.id;
       return event;
     }
@@ -92,33 +90,45 @@ class DatabaseService {
   }
 
   Stream<Event> getEventStream(Event event) {
-    return events.doc(event.docId).snapshots().map((event) => Event.fromMap(event.data()));
+    if(event.groupId == null){
+      return events.doc(event.docId).snapshots().map((event) => Event.fromMap(event.data() as Map));
+    }else{
+      return groups.doc(event.groupId).collection("events").doc(event.docId).snapshots().map((event) => Event.fromMap(event.data() as Map));
+    }
+  }
+
+  Stream<Group> getGroupStream(Group group) {
+    return groups.doc(group.docId).snapshots().map((groupStream) {
+      Group groupNew = Group.fromMap(groupStream.data() as Map);
+      groupNew.docId = group.docId;
+      return groupNew;
+    });
   }
 
   Future<Event> getOneTimeGroupEvent(Group group, String documentId) async {
-    Event event = Event();
+    Event event;
     DocumentSnapshot docOf = await groups
         .doc(group.docId)
         .collection('events')
         .doc(documentId)
         .get();
 
-    event = Event.fromMap(docOf.data());
+    event = Event.fromMap(docOf.data() as Map);
     event.docId = docOf.id;
     return event;
   }
 
   Future<Group> getOneTimeGroup(String documentId) async {
-    Group group = Group();
+    Group group;
     DocumentSnapshot docOf = await groups.doc(documentId).get();
 
-    group = Group.fromMap(docOf.data());
+    group = Group.fromMap(docOf.data() as Map);
     group.docId = docOf.id;
     return group;
   }
 
   Future<String> joinEvent(Event event) async {
-    String userId = user.uid;
+    String userId = user!.uid;
 
     bool result = await events
         .doc(event.docId)
@@ -149,7 +159,7 @@ class DatabaseService {
   }
 
   Future<String> joinGroup(Group group) async {
-    String userId = user.uid;
+    String userId = user!.uid;
 
     bool result = await groups
         .doc(group.docId)
@@ -180,7 +190,7 @@ class DatabaseService {
   }
 
   Future<String> joinGroupEvent(Event event, Group group) async {
-    String userId = user.uid;
+    String userId = user!.uid;
 
     bool result = await groups
         .doc(group.docId)
@@ -289,7 +299,7 @@ class DatabaseService {
   Future<String> leaveEvent(String id, {bool eventExists = true}) async {
     String result = "";
 
-    String userId = user.uid;
+    String userId = user!.uid;
     result = await users
         .doc(userId)
         .collection("preferences")
@@ -303,7 +313,6 @@ class DatabaseService {
     });
 
     if (eventExists) {
-      print(id);
       events.doc(id).update({
         "usersIn": FieldValue.arrayRemove([userId])
       });
@@ -315,7 +324,7 @@ class DatabaseService {
   Future<String> leaveGroup(String id, {bool groupExists = true}) async {
     String result = "";
 
-    String userId = user.uid;
+    String userId = user!.uid;
     result = await users
         .doc(userId)
         .collection("preferences")
@@ -329,7 +338,6 @@ class DatabaseService {
     });
 
     if (groupExists) {
-      print(id);
       groups.doc(id).update({
         "usersIn": FieldValue.arrayRemove([userId])
       });
@@ -345,11 +353,11 @@ class DatabaseService {
     return result;
   }
 
-  Future<String> leaveEventInGroup(String id, Group group,
+  Future<String> leaveEventInGroup(String? id, Group group,
       {bool eventExists = true}) async {
     String result = "";
 
-    String userId = user.uid;
+    String userId = user!.uid;
     result = await users
         .doc(userId)
         .collection("preferences")
@@ -363,7 +371,6 @@ class DatabaseService {
     });
 
     if (eventExists) {
-      print(id);
       groups.doc(group.docId).collection('events').doc(id).update({
         "usersIn": FieldValue.arrayRemove([userId])
       });
@@ -372,7 +379,7 @@ class DatabaseService {
     return result;
   }
 
-  Future<String> kickFromEvent({String userId, String eventId}) async {
+  Future<String> kickFromEvent({required String userId, required String eventId}) async {
     bool removedSuc = await users
         .doc(userId)
         .collection("preferences")
@@ -398,7 +405,7 @@ class DatabaseService {
     }
   }
 
-  Future<String> kickFromGroup({String userId, String eventId}) async {
+  Future<String> kickFromGroup({required String userId, required String? eventId}) async {
     bool removedSuc = await users
         .doc(userId)
         .collection("preferences")
@@ -425,7 +432,7 @@ class DatabaseService {
   }
 
   Future<List<Event>> getPublicEventsToDisplay(int limit,
-      {DateTimeRange range}) async {
+      {DateTimeRange? range}) async {
     if (range == null) {
       range = DateTimeRange(
           start: DateTime.now(),
@@ -447,37 +454,36 @@ class DatabaseService {
     eventsAlreadyIn = await getMyEventsIn().then((value) {
       List<String> events = [];
       for (Event event in value) {
-        events.add(event.docId);
+        events.add(event.docId!);
       }
       return events;
     });
 
     List<String> requestedEvents = [];
     List<String> notInterested = [];
-    await getUserPreferences(user.uid).then((value) {
-      if (value.awaitingRequest != null) {
-        for (var item in value.awaitingRequest) {
+    await getUserPreferences(user!.uid).then((value) {
+      if (value!.awaitingRequest != null) {
+        for (var item in value.awaitingRequest!) {
           requestedEvents.add(item.toString());
         }
       }
       if (value.notInterested != null) {
-        for (var item in value.notInterested) {
+        for (var item in value.notInterested!) {
           notInterested.add(item.toString());
         }
       }
     });
 
     for (QueryDocumentSnapshot documentSnapshot in eventsOf.docs) {
-      if (documentSnapshot.data()['owner'] != user.uid &&
+      if (documentSnapshot['owner'] != user!.uid &&
           !eventsAlreadyIn.contains(documentSnapshot.id) &&
           !requestedEvents.contains(documentSnapshot.id) &&
           !notInterested.contains(documentSnapshot.id)) {
-        Event cevent = Event.fromMap(documentSnapshot.data());
+        Event cevent = Event.fromMap(documentSnapshot.data() as Map);
         cevent.docId = documentSnapshot.id;
         eventsList.add(cevent);
       }
     }
-    print(eventsList.length);
     return eventsList;
   }
 
@@ -490,32 +496,32 @@ class DatabaseService {
     groupsAlreadyIn = await getMyGroupsIn().then((value) {
       List<String> groups = [];
       for (Group group in value) {
-        groups.add(group.docId);
+        groups.add(group.docId!);
       }
       return groups;
     });
 
     List<String> requestedGroups = [];
     List<String> notInterested = [];
-    await getUserPreferences(user.uid).then((value) {
-      if (value.awaitingGroupRequests != null) {
-        for (var item in value.awaitingGroupRequests) {
+    await getUserPreferences(user!.uid).then((value) {
+      if (value!.awaitingGroupRequests != null) {
+        for (var item in value.awaitingGroupRequests!) {
           requestedGroups.add(item.toString());
         }
       }
       if (value.notInterested != null) {
-        for (var item in value.notInterested) {
+        for (var item in value.notInterested!) {
           notInterested.add(item.toString());
         }
       }
     });
 
     for (QueryDocumentSnapshot documentSnapshot in eventsOf.docs) {
-      if (documentSnapshot.data()['owner'] != user.uid &&
+      if (documentSnapshot['owner'] != user!.uid &&
           !groupsAlreadyIn.contains(documentSnapshot.id) &&
           !requestedGroups.contains(documentSnapshot.id) &&
           !notInterested.contains(documentSnapshot.id)) {
-        Group cgroup = Group.fromMap(documentSnapshot.data());
+        Group cgroup = Group.fromMap(documentSnapshot.data() as Map);
         cgroup.docId = documentSnapshot.id;
         groupsList.add(cgroup);
       }
@@ -525,7 +531,7 @@ class DatabaseService {
 
   Future<List<Event>> getPublicEventsToDisplayLocationFiltered(
       int limit, GeoFirePoint center,
-      {double radius = 50, DateTimeRange range}) async {
+      {double radius = 50, DateTimeRange? range}) async {
     if (range == null) {
       range = DateTimeRange(
           start: DateTime.now(),
@@ -533,7 +539,7 @@ class DatabaseService {
               DateTime.now().day));
     }
 
-    var geo = Geoflutterfire();
+    var geo = GeoFlutterFire();
 
     Query eventsOf = events.where('private', isEqualTo: false).limit(limit);
 
@@ -549,41 +555,40 @@ class DatabaseService {
     eventsAlreadyIn = await getMyEventsIn().then((value) {
       List<String> events = [];
       for (Event event in value) {
-        events.add(event.docId);
+        events.add(event.docId!);
       }
       return events;
     });
 
     List<String> requestedEvents = [];
     List<String> notInterested = [];
-    await getUserPreferences(user.uid).then((value) {
-      if (value.awaitingRequest != null) {
-        for (var item in value.awaitingRequest) {
+    await getUserPreferences(user!.uid).then((value) {
+      if (value!.awaitingRequest != null) {
+        for (var item in value.awaitingRequest!) {
           requestedEvents.add(item.toString());
         }
       }
       if (value.notInterested != null) {
-        for (var item in value.notInterested) {
+        for (var item in value.notInterested!) {
           notInterested.add(item.toString());
         }
       }
     });
 
-    for (QueryDocumentSnapshot documentSnapshot in eventsReturned) {
-      if (documentSnapshot.data()['owner'] != user.uid &&
+    for (DocumentSnapshot documentSnapshot in eventsReturned) {
+      if (documentSnapshot['owner'] != user!.uid &&
           !eventsAlreadyIn.contains(documentSnapshot.id) &&
           !requestedEvents.contains(documentSnapshot.id) &&
           !notInterested.contains(documentSnapshot.id) &&
-          documentSnapshot.data()['dateStamp'] >=
+          documentSnapshot['dateStamp'] >=
               range.start.millisecondsSinceEpoch &&
-          documentSnapshot.data()['dateStamp'] <=
+          documentSnapshot['dateStamp'] <=
               range.end.millisecondsSinceEpoch) {
-        Event cevent = Event.fromMap(documentSnapshot.data());
+        Event cevent = Event.fromMap(documentSnapshot.data() as Map);
         cevent.docId = documentSnapshot.id;
         eventsList.add(cevent);
       }
     }
-    print(eventsList.length);
     return eventsList;
   }
 
@@ -591,28 +596,28 @@ class DatabaseService {
     List<Event> eventsList = [];
     QuerySnapshot eventsOf = await events
         .where('private', isEqualTo: true)
-        .where('usersPermitted', arrayContains: user.uid)
+        .where('usersPermitted', arrayContains: user!.uid)
         .limit(limit)
         .get();
 
     List<String> awaitingRequests = [];
     List<String> notInterested = [];
-    await getUserPreferences(user.uid).then((value) {
-      if (value.notInterested != null) {
-        for (var item in value.notInterested) {
+    await getUserPreferences(user!.uid).then((value) {
+      if (value!.notInterested != null) {
+        for (var item in value.notInterested!) {
           notInterested.add(item.toString());
         }
       }
       if (value.awaitingRequest != null) {
-        for (var item in value.awaitingRequest) {
+        for (var item in value.awaitingRequest!) {
           awaitingRequests.add(item.toString());
         }
       }
     });
 
     for (QueryDocumentSnapshot documentSnapshot in eventsOf.docs) {
-      Event cevent = Event.fromMap(documentSnapshot.data());
-      if ((cevent.usersIn == null || !cevent.usersIn.contains(user.uid)) &&
+      Event cevent = Event.fromMap(documentSnapshot.data() as Map);
+      if ((cevent.usersIn != null || !cevent.usersIn!.contains(user!.uid)) &&
           !notInterested.contains(documentSnapshot.id) &&
           !awaitingRequests.contains(documentSnapshot.id)) {
         cevent.docId = documentSnapshot.id;
@@ -626,28 +631,28 @@ class DatabaseService {
     List<Group> groupsList = [];
     QuerySnapshot eventsOf = await groups
         .where('private', isEqualTo: true)
-        .where('usersPermitted', arrayContains: user.uid)
+        .where('usersPermitted', arrayContains: user!.uid)
         .limit(limit)
         .get();
 
     List<String> awaitingRequests = [];
     List<String> notInterested = [];
-    await getUserPreferences(user.uid).then((value) {
-      if (value.notInterested != null) {
-        for (var item in value.notInterested) {
+    await getUserPreferences(user!.uid).then((value) {
+      if (value!.notInterested != null) {
+        for (var item in value.notInterested!) {
           notInterested.add(item.toString());
         }
       }
       if (value.awaitingGroupRequests != null) {
-        for (var item in value.awaitingGroupRequests) {
+        for (var item in value.awaitingGroupRequests!) {
           awaitingRequests.add(item.toString());
         }
       }
     });
 
     for (QueryDocumentSnapshot documentSnapshot in eventsOf.docs) {
-      Group cevent = Group.fromMap(documentSnapshot.data());
-      if ((cevent.usersIn == null || !cevent.usersIn.contains(user.uid)) &&
+      Group cevent = Group.fromMap(documentSnapshot.data() as Map);
+      if ((cevent.usersIn == null || !cevent.usersIn!.contains(user!.uid)) &&
           !notInterested.contains(documentSnapshot.id) &&
           !awaitingRequests.contains(documentSnapshot.id)) {
         cevent.docId = documentSnapshot.id;
@@ -660,11 +665,11 @@ class DatabaseService {
   Future<List<Event>> getMyEventsIn() async {
     List<Event> eventsList = [];
 
-    UserData userData = await getUserPreferences(user.uid);
-    for (String id in userData.myEventsJoined) {
+    UserData? userData = await getUserPreferences(user!.uid);
+    for (String id in userData!.myEventsJoined!) {
       await events.doc(id).get().then((value) {
         if (value.exists) {
-          Event cevent = Event.fromMap(value.data());
+          Event cevent = Event.fromMap(value.data() as Map);
           cevent.docId = value.id;
           eventsList.add(cevent);
         } else {
@@ -679,13 +684,13 @@ class DatabaseService {
   Future<List<Group>> getMyGroupsIn() async {
     List<Group> groupsList = [];
 
-    UserData userData = await getUserPreferences(user.uid);
+    UserData? userData = await getUserPreferences(user!.uid);
 
-    if (userData.groupsIn != null) {
-      for (String id in userData.groupsIn) {
+    if (userData!.groupsIn != null) {
+      for (String id in userData.groupsIn!) {
         await groups.doc(id).get().then((value) {
           if (value.exists) {
-            Group cevent = Group.fromMap(value.data());
+            Group cevent = Group.fromMap(value.data() as Map);
             cevent.docId = value.id;
             groupsList.add(cevent);
           } else {
@@ -701,10 +706,10 @@ class DatabaseService {
   Future<List<Event>> getMyEventsCreated() async {
     List<Event> eventsList = [];
     QuerySnapshot eventsOf =
-        await events.where('owner', isEqualTo: user.uid).get();
+        await events.where('owner', isEqualTo: user!.uid).get();
 
     for (QueryDocumentSnapshot documentSnapshot in eventsOf.docs) {
-      Event cevent = Event.fromMap(documentSnapshot.data());
+      Event cevent = Event.fromMap(documentSnapshot.data() as Map);
       cevent.docId = documentSnapshot.id;
       eventsList.add(cevent);
     }
@@ -714,10 +719,10 @@ class DatabaseService {
   Future<List<Group>> getMyGroupsCreated() async {
     List<Group> groupsList = [];
     QuerySnapshot eventsOf =
-        await groups.where('owner', isEqualTo: user.uid).get();
+        await groups.where('owner', isEqualTo: user!.uid).get();
 
     for (QueryDocumentSnapshot documentSnapshot in eventsOf.docs) {
-      Group cgroup = Group.fromMap(documentSnapshot.data());
+      Group cgroup = Group.fromMap(documentSnapshot.data() as Map);
       cgroup.docId = documentSnapshot.id;
       groupsList.add(cgroup);
     }
@@ -731,25 +736,24 @@ class DatabaseService {
 
     List<String> requestedEvents = [];
     List<String> notInterested = [];
-    await getUserPreferences(user.uid).then((value) {
-      if (value.awaitingRequestGroupEvent != null) {
-        for (var item in value.awaitingRequestGroupEvent) {
+    await getUserPreferences(user!.uid).then((value) {
+      if (value!.awaitingRequestGroupEvent != null) {
+        for (var item in value.awaitingRequestGroupEvent!) {
           requestedEvents.add(idsFromGERequest(item)['event']);
         }
       }
       if (value.notInterested != null) {
-        for (var item in value.notInterested) {
+        for (var item in value.notInterested!) {
           notInterested.add(item.toString());
         }
       }
     });
 
-    print(requestedEvents);
 
     for (QueryDocumentSnapshot documentSnapshot in eventsOf.docs) {
       if (!requestedEvents.contains(documentSnapshot.id) &&
           !notInterested.contains(documentSnapshot.id)) {
-        Event cevent = Event.fromMap(documentSnapshot.data());
+        Event cevent = Event.fromMap(documentSnapshot.data() as Map);
         cevent.docId = documentSnapshot.id;
         eventsList.add(cevent);
       }
@@ -763,14 +767,14 @@ class DatabaseService {
         await groups.doc(group.docId).collection('blogs').get();
 
     for (QueryDocumentSnapshot documentSnapshot in eventsOf.docs) {
-      BlogPost cevent = BlogPost.fromMap(documentSnapshot.data());
+      BlogPost cevent = BlogPost.fromMap(documentSnapshot.data() as Map);
       cevent.docId = documentSnapshot.id;
       blogsList.add(cevent);
     }
     return blogsList;
   }
 
-  Future<String> createBlogPost(Group group, BlogPost blogPost) async {
+  Future<String?> createBlogPost(Group group, BlogPost blogPost) async {
     return await groups
         .doc(group.docId)
         .collection('blogs')
@@ -796,21 +800,21 @@ class DatabaseService {
     eventsAlreadyIn = await getMyEventsIn().then((value) {
       List<String> events = [];
       for (Event event in value) {
-        events.add(event.docId);
+        events.add(event.docId!);
       }
       return events;
     });
 
     List<String> notInterested = [];
     List<String> requestedEvents = [];
-    await getUserPreferences(user.uid).then((value) {
-      if (value.awaitingRequest != null) {
-        for (var item in value.awaitingRequest) {
+    await getUserPreferences(user!.uid).then((value) {
+      if (value!.awaitingRequest != null) {
+        for (var item in value.awaitingRequest!) {
           requestedEvents.add(item.toString());
         }
       }
       if (value.notInterested != null) {
-        for (var item in value.notInterested) {
+        for (var item in value.notInterested!) {
           notInterested.add(item.toString());
         }
       }
@@ -823,11 +827,11 @@ class DatabaseService {
         .get();
 
     for (QueryDocumentSnapshot documentSnapshot in eventsOf.docs) {
-      if (documentSnapshot.data()['owner'] != user.uid &&
+      if (documentSnapshot['owner'] != user!.uid &&
           !eventsAlreadyIn.contains(documentSnapshot.id) &&
           !requestedEvents.contains(documentSnapshot.id) &&
           !notInterested.contains(documentSnapshot.id)) {
-        Event cevent = Event.fromMap(documentSnapshot.data());
+        Event cevent = Event.fromMap(documentSnapshot.data() as Map);
         cevent.docId = documentSnapshot.id;
         eventsList.add(cevent);
       }
@@ -872,19 +876,19 @@ class DatabaseService {
         .catchError((error) => print("Failed to add user: $error"));
   }
 
-  Future<UserData> getUserPreferences(String uid) async {
+  Future<UserData?> getUserPreferences(String uid) async {
     DocumentSnapshot userPage = await users
         .doc(uid)
         .collection("preferences")
         .doc("preference save")
         .get();
 
-    return UserData.fromMap(userPage.data());
+    return UserData.fromMap(userPage.data() as Map);
   }
 
   Future<Map> getUser(String uid) async {
     DocumentSnapshot doc = await users.doc(uid).get();
-    return doc.data();
+    return doc.data() as Map;
   }
 
   Future<List<FriendData>> getUserFriends(String uid) async {
@@ -896,8 +900,8 @@ class DatabaseService {
         .then((snapshot) async {
       List<FriendData> userDatas = [];
 
-      UserData thisUserData = UserData.fromMap(snapshot.data());
-      List userIds = thisUserData.following;
+      UserData thisUserData = UserData.fromMap(snapshot.data() as Map);
+      List userIds = thisUserData.following!;
 
       for (String id in userIds) {
         Map friendData = await getUser(id);
@@ -907,14 +911,13 @@ class DatabaseService {
 
       return userDatas;
     }).catchError((e) {
-      print(e);
-      return [null];
+      return List<FriendData>.empty();
     });
   }
 
-  Future<String> addFriend(String id) async {
+  Future<String> addFriend(String? id) async {
     return await users
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection("preferences")
         .doc("preference save")
         .update({
@@ -924,9 +927,9 @@ class DatabaseService {
         .catchError((e) => "Something went wrong");
   }
 
-  Future<String> removeFriend(String id) async {
+  Future<String> removeFriend(String? id) async {
     return await users
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection("preferences")
         .doc("preference save")
         .update({
@@ -936,11 +939,11 @@ class DatabaseService {
         .catchError((e) => "Something went wrong");
   }
 
-  Future<FriendData> searchFriendsEmail(String email) async {
-    List<FriendData> friends = await getUserFriends(user.uid);
+  Future<FriendData?> searchFriendsEmail(String email) async {
+    List<FriendData> friends = await getUserFriends(user!.uid);
     List<String> idsAlready = [];
     for (FriendData friend in friends) {
-      idsAlready.add(friend.userId);
+      idsAlready.add(friend.userId!);
     }
 
     return await users
@@ -949,9 +952,9 @@ class DatabaseService {
         .get()
         .then((value) {
       if (value.docs.length > 0 &&
-          value.docs[0].id != user.uid &&
+          value.docs[0].id != user!.uid &&
           !idsAlready.contains(value.docs[0].id)) {
-        FriendData friend = FriendData.fromMap(value.docs[0].data());
+        FriendData friend = FriendData.fromMap(value.docs[0].data() as Map);
         friend.userId = value.docs[0].id;
         return friend;
       } else {
@@ -962,18 +965,18 @@ class DatabaseService {
 
   Future<String> editNameAndBio(String name, String bio) async {
     String result = await users
-        .doc(user.uid)
+        .doc(user!.uid)
         .update({'name': name, 'bio': bio})
         .then((v) => "Name and bio updated")
         .catchError((e) => "Something went wrong");
     return result;
   }
 
-  Future<List<FriendData>> searchFriendsName(String name) async {
-    List<FriendData> friends = await getUserFriends(user.uid);
+  Future<List<FriendData>?> searchFriendsName(String name) async {
+    List<FriendData> friends = await getUserFriends(user!.uid);
     List<String> idsAlready = [];
     for (FriendData friend in friends) {
-      idsAlready.add(friend.userId);
+      idsAlready.add(friend.userId!);
     }
 
     return await users
@@ -984,16 +987,16 @@ class DatabaseService {
       if (value.docs.length > 0) {
         List<FriendData> friends = [];
         for (DocumentSnapshot documentSnapshot in value.docs) {
-          if (documentSnapshot.id != user.uid &&
+          if (documentSnapshot.id != user!.uid &&
               !idsAlready.contains(documentSnapshot.id)) {
-            FriendData friend = FriendData.fromMap(documentSnapshot.data());
+            FriendData friend = FriendData.fromMap(documentSnapshot.data() as Map);
             friend.userId = documentSnapshot.id;
             friends.add(friend);
           }
         }
         return friends;
       } else {
-        return null;
+        return List<FriendData>.empty();
       }
     });
   }
@@ -1004,7 +1007,7 @@ class DatabaseService {
     });
   }
 
-  void deleteGroupChat(String id) async {
+  void deleteGroupChat(String? id) async {
     if (id != null) {
       batchDelete(groupChats.doc(id).collection("messages"));
 
@@ -1060,14 +1063,14 @@ class DatabaseService {
     if (event.usersIn == null) {
       return usersInReturn;
     }
-    for (var userId in event.usersIn) {
+    for (var userId in event.usersIn!) {
       Map friendData = await getUser(userId);
       friendData["userId"] = userId;
-      if (userId != user.uid) {
+      if (userId != user!.uid) {
         usersInReturn.add(FriendData.fromMap(friendData));
       }
     }
-    if (event.owner != user.uid) {
+    if (event.owner != user!.uid) {
       Map friendData = await getUser(event.owner);
       friendData["userId"] = event.owner;
       usersInReturn.add(FriendData.fromMap(friendData));
@@ -1077,26 +1080,25 @@ class DatabaseService {
 
   Future<List<FriendData>> getUsersInGroupp(Group group) async {
     List<FriendData> usersInReturn = [];
-    print(group.toMap());
-    if (group.usersIn == null || group.usersIn.length == 0) {
+    if (group.usersIn == null || group.usersIn!.length == 0) {
       return [];
     }
-    for (var userId in group.usersIn) {
+    for (var userId in group.usersIn!) {
       Map friendData = await getUser(userId);
       friendData["userId"] = userId;
-      if (userId != user.uid) {
+      if (userId != user!.uid) {
         usersInReturn.add(FriendData.fromMap(friendData));
       }
     }
-    if (group.owner != user.uid) {
-      Map friendData = await getUser(group.owner);
+    if (group.owner != user!.uid) {
+      Map friendData = await getUser(group.owner!);
       friendData["userId"] = group.owner;
       usersInReturn.add(FriendData.fromMap(friendData));
     }
     return usersInReturn;
   }
 
-  Stream streamGroupchat(String id) {
+  Stream<QuerySnapshot> streamGroupchat(String? id) {
     Stream<QuerySnapshot> stream = groupChats
         .doc(id)
         .collection("messages")
@@ -1108,7 +1110,7 @@ class DatabaseService {
   }
 
   Future<bool> sendMessageToGroupChat(
-      {Message message, String groupchatId}) async {
+      {required Message message, required String? groupchatId}) async {
     return await groupChats
         .doc(groupchatId)
         .collection("messages")
@@ -1117,40 +1119,40 @@ class DatabaseService {
         .catchError((e) => false);
   }
 
-  ensureDocExists({Event event, String to}) {
+  ensureDocExists({required Event event, required String? to}) {
     events
         .doc(event.docId)
         .collection("messages")
-        .doc(to == null ? user.uid : to)
+        .doc(to == null ? user!.uid : to)
         .get()
         .then((value) {
       if (!value.exists) {
         events
             .doc(event.docId)
             .collection("messages")
-            .doc(to == null ? user.uid : to)
+            .doc(to == null ? user!.uid : to)
             .set({'non-null': true});
       }
     });
   }
 
   Future<bool> sendMessageToFromOwner(
-      {Message message, Event event, String to}) async {
+      {required Message message, required Event event, required String? to}) async {
     return await events
         .doc(event.docId)
         .collection("messages")
-        .doc(to == null ? user.uid : to)
+        .doc(to == null ? user!.uid : to)
         .collection("message_stream")
         .add(message.toMap())
         .then((value) => true)
         .catchError((onError) => false);
   }
 
-  Stream streamMessagesWithOwner(Event event, {String from}) {
+  Stream<QuerySnapshot> streamMessagesWithOwner(Event event, {required String? from}) {
     Stream<QuerySnapshot> stream = events
         .doc(event.docId)
         .collection("messages")
-        .doc(from == null ? user.uid : from)
+        .doc(from == null ? user!.uid : from)
         .collection("message_stream")
         .orderBy('timeStamp', descending: true)
         .limit(25)
@@ -1159,12 +1161,12 @@ class DatabaseService {
     return stream;
   }
 
-  Future<List<FriendData>> getOwnerInbox(Event event) async {
+  Future<List<FriendData>> getOwnerInbox(Event? event) async {
     List userMessages = [];
     List<FriendData> friends = [];
 
     QuerySnapshot snapshotOfDocs =
-        await events.doc(event.docId.trim()).collection("messages").get();
+        await events.doc(event!.docId!.trim()).collection("messages").get();
 
     for (DocumentSnapshot documentSnapshot in snapshotOfDocs.docs) {
       userMessages.add(documentSnapshot.id);
@@ -1181,7 +1183,7 @@ class DatabaseService {
 
   Future<String> notInterested(Event event) async {
     return await users
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection("preferences")
         .doc("preference save")
         .update({
@@ -1193,7 +1195,7 @@ class DatabaseService {
 
   Future<String> notInterestedInGroup(Group group) async {
     return await users
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection("preferences")
         .doc("preference save")
         .update({
@@ -1205,7 +1207,7 @@ class DatabaseService {
 
   Future<String> requestToJoin(Event event, Request request) async {
     await users
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection("preferences")
         .doc("preference save")
         .update({
@@ -1222,7 +1224,7 @@ class DatabaseService {
 
   Future<String> requestToJoinGroup(Group group, Request request) async {
     await users
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection("preferences")
         .doc("preference save")
         .update({
@@ -1240,7 +1242,7 @@ class DatabaseService {
   Future<String> requestToJoinGroupEvent(
       Event event, Request request, Group group) async {
     await users
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection("preferences")
         .doc("preference save")
         .update({
@@ -1267,7 +1269,7 @@ class DatabaseService {
         .get();
 
     for (DocumentSnapshot doc in snapshot.docs) {
-      Request request = Request.fromMap(doc.data());
+      Request request = Request.fromMap(doc.data() as Map);
       request.docId = doc.id;
       requests.add(request);
     }
@@ -1283,7 +1285,7 @@ class DatabaseService {
         .get();
 
     for (DocumentSnapshot doc in snapshot.docs) {
-      Request request = Request.fromMap(doc.data());
+      Request request = Request.fromMap(doc.data() as Map);
       request.docId = doc.id;
       requests.add(request);
     }
@@ -1307,10 +1309,10 @@ class DatabaseService {
 
   Future<List<Request>> getRequestsPending() async {
     List<Request> requests = [];
-    UserData me = await getUserPreferences(user.uid);
+    UserData? me = await getUserPreferences(user!.uid);
 
-    for (String eventId in me.awaitingRequest) {
-      Event event = await getOneTimeEvent(eventId);
+    for (String eventId in me!.awaitingRequest!) {
+      Event? event = await getOneTimeEvent(eventId);
       if(event == null){
         clearRequest(eventId);
         continue;
@@ -1318,9 +1320,9 @@ class DatabaseService {
       QuerySnapshot snapshot = await events
           .doc(event.docId)
           .collection("requests")
-          .where("userId", isEqualTo: user.uid)
+          .where("userId", isEqualTo: user!.uid)
           .get();
-      Request request = Request.fromMap(snapshot.docs[0].data());
+      Request request = Request.fromMap(snapshot.docs[0].data() as Map);
       request.docId = snapshot.docs[0].id;
       request.eventAttached = event;
       requests.add(request);
@@ -1331,13 +1333,13 @@ class DatabaseService {
 
   Future<List<Request>> getRequestsGEPending(Group group) async {
     List<Request> requests = [];
-    UserData me = await getUserPreferences(user.uid);
+    UserData? me = await getUserPreferences(user!.uid);
 
-    if (me.awaitingRequestGroupEvent == null) {
+    if (me!.awaitingRequestGroupEvent == null) {
       return requests;
     }
 
-    for (String stringVal in me.awaitingRequestGroupEvent) {
+    for (String stringVal in me.awaitingRequestGroupEvent!) {
       String groupId = idsFromGERequest(stringVal)['group'];
       String eventId = idsFromGERequest(stringVal)['event'];
       if (groupId == group.docId) {
@@ -1347,9 +1349,9 @@ class DatabaseService {
             .collection("events")
             .doc(eventId)
             .collection('requests')
-            .where("userId", isEqualTo: user.uid)
+            .where("userId", isEqualTo: user!.uid)
             .get();
-        Request request = Request.fromMap(snapshot.docs[0].data());
+        Request request = Request.fromMap(snapshot.docs[0].data() as Map);
         request.docId = snapshot.docs[0].id;
         request.eventAttached = event;
         request.groupAttached = group;
@@ -1362,17 +1364,17 @@ class DatabaseService {
 
   Future<List<Request>> getRequestsPendingGroups() async {
     List<Request> requests = [];
-    UserData me = await getUserPreferences(user.uid);
+    UserData? me = await getUserPreferences(user!.uid);
 
-    if (me.awaitingGroupRequests != null) {
-      for (String groupId in me.awaitingGroupRequests) {
+    if (me!.awaitingGroupRequests != null) {
+      for (String groupId in me.awaitingGroupRequests!) {
         Group group = await getOneTimeGroup(groupId);
         QuerySnapshot snapshot = await groups
             .doc(group.docId)
             .collection("requests")
-            .where("userId", isEqualTo: user.uid)
+            .where("userId", isEqualTo: user!.uid)
             .get();
-        Request request = Request.fromMap(snapshot.docs[0].data());
+        Request request = Request.fromMap(snapshot.docs[0].data() as Map);
         request.docId = snapshot.docs[0].id;
         request.groupAttached = group;
         requests.add(request);
@@ -1404,7 +1406,7 @@ class DatabaseService {
 
   Future<String> clearRequest(String id) async {
     return await users
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection("preferences")
         .doc("preference save")
         .update({
@@ -1417,7 +1419,7 @@ class DatabaseService {
 
   Future<String> agknoledgeRequestDecision(Request request) async {
     await events
-        .doc(request.eventAttached.docId)
+        .doc(request.eventAttached!.docId!)
         .collection("requests")
         .doc(request.docId)
         .delete();
@@ -1428,7 +1430,7 @@ class DatabaseService {
         .doc("preference save")
         .update({
           "awaitingRequest":
-              FieldValue.arrayRemove([request.eventAttached.docId])
+              FieldValue.arrayRemove([request.eventAttached!.docId!])
         })
         .then((value) => "Success")
         .catchError((e) => "Something went wrong");
@@ -1436,9 +1438,9 @@ class DatabaseService {
 
   Future<String> agknoledgeRequestDecisionGE(Request request) async {
     await groups
-        .doc(request.groupAttached.docId)
+        .doc(request.groupAttached!.docId!)
         .collection("events")
-        .doc(request.eventAttached.docId)
+        .doc(request.eventAttached!.docId!)
         .collection('requests')
         .doc(request.docId)
         .delete();
@@ -1449,7 +1451,7 @@ class DatabaseService {
         .doc("preference save")
         .update({
           "awaitingRequestGroupEvent": FieldValue.arrayRemove(
-              ['${request.eventAttached.docId}/${request.groupAttached.docId}'])
+              ['${request.eventAttached!.docId}/${request.groupAttached!.docId}'])
         })
         .then((value) => "Success")
         .catchError((e) => "Something went wrong");
@@ -1457,7 +1459,7 @@ class DatabaseService {
 
   Future<String> agknoledgeRequestDecisionGroup(Request request) async {
     await groups
-        .doc(request.groupAttached.docId)
+        .doc(request.groupAttached!.docId)
         .collection("requests")
         .doc(request.docId)
         .delete();
@@ -1468,14 +1470,14 @@ class DatabaseService {
         .doc("preference save")
         .update({
           "awaitingGroupRequests":
-              FieldValue.arrayRemove([request.groupAttached.docId])
+              FieldValue.arrayRemove([request.groupAttached!.docId])
         })
         .then((value) => "Success")
         .catchError((e) => "Something went wrong");
   }
 
-  Future<String> allowRequestStatus(Event event, Request request) async {
-    events.doc(event.docId).collection("requests").doc(request.docId).delete();
+  Future<String> allowRequestStatus(Event? event, Request request) async {
+    events.doc(event!.docId).collection("requests").doc(request.docId).delete();
 
     await users
         .doc(request.userId)
@@ -1516,14 +1518,14 @@ class DatabaseService {
 
   Stream<List<NotificationData>> streamNotifications() {
     return users
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection('notifications')
         .snapshots()
         .map((data) {
       List<NotificationData> notifs = [];
       for (DocumentSnapshot documentSnapshot in data.docs) {
         NotificationData notification =
-            NotificationData.fromMap(documentSnapshot.data());
+            NotificationData.fromMap(documentSnapshot.data() as Map);
         notification.id = documentSnapshot.id;
         notifs.add(notification);
       }
@@ -1533,7 +1535,7 @@ class DatabaseService {
 
   Future<String> deleteNotification(NotificationData notif) async {
     return await users
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection('notifications')
         .doc(notif.id)
         .delete()
@@ -1543,7 +1545,7 @@ class DatabaseService {
 
   Future<int> amountOfNotifs() async {
     return await users
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection('notifications')
         .get()
         .then((value) => value.docs.length)
@@ -1551,10 +1553,10 @@ class DatabaseService {
   }
 
   Future<List<String>> getTagsSubbed() async {
-    UserData userData = await getUserPreferences(user.uid);
+    UserData? userData = await getUserPreferences(user!.uid);
     List<String> tags = [];
-    if(userData.subscribedTags!=null){
-      for (var item in userData.subscribedTags) {
+    if(userData!.subscribedTags != null){
+      for (var item in userData.subscribedTags!) {
         tags.add(item.toString());
       }
     }
@@ -1563,7 +1565,7 @@ class DatabaseService {
 
   Future<bool> subToTag(Tag tag) async {
     return await users
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection("preferences")
         .doc("preference save")
         .update({
@@ -1575,7 +1577,7 @@ class DatabaseService {
 
   Future<bool> unSubFromTag(Tag tag) async {
     return await users
-        .doc(user.uid)
+        .doc(user!.uid)
         .collection("preferences")
         .doc("preference save")
         .update({
@@ -1589,7 +1591,7 @@ class DatabaseService {
     return await tags.get().then((value) {
       List<Tag> tags = [];
       for (DocumentSnapshot doc in value.docs) {
-        Tag tag = Tag.fromMap(doc.data());
+        Tag tag = Tag.fromMap(doc.data() as Map);
         tag.id = doc.id;
         tags.add(tag);
       }
@@ -1609,13 +1611,13 @@ class DatabaseService {
   Future calculateAmountOwed() async {
     var amountOwed = 0.0;
     await firestore.collection('payments')
-        .where('paymentRecipient', isEqualTo: user.uid)
+        .where('paymentRecipient', isEqualTo: user!.uid)
         .where('payedOut', isEqualTo: false)
         .where('locked', isEqualTo: false)
         .get()
         .then((value) {
            for(QueryDocumentSnapshot doc in value.docs){
-             amountOwed += double.parse(doc.data()['amount']);
+             amountOwed += double.parse(doc['amount']);
            }
          })
         .catchError((e){
@@ -1629,12 +1631,21 @@ class DatabaseService {
     if(user == null){
       return AccountLevels.BASIC;
     }
-    var data = await users.doc(user.uid).collection('level').doc('level').get();
+    var data = await users.doc(user!.uid).collection('level').doc('level').get();
     if(data.exists){
-      AccountLevels level = AccountLevels.values[data.data()['level']];
+      AccountLevels level = AccountLevels.values[(data.data() as Map)['level']];
       return level;
     }
     return AccountLevels.BASIC;
+  }
+
+  Future<bool> reconcileTokenSheet(String token) async {
+    CollectionReference tokens = FirebaseFirestore.instance.collection('fcm_tokens');
+    String userId = user!.uid;
+    return tokens.doc(userId)
+        .set({'tokens': FieldValue.arrayUnion([token])}, SetOptions(merge: true))
+        .then((v)=>true)
+        .catchError((e)=>false);
   }
 
 }

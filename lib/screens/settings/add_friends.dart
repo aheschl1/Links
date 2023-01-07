@@ -34,14 +34,14 @@ class _AddFriendsState extends State<AddFriends> {
 
     if(searchBar.text.isNotEmpty){
       if(searchBar.text.contains("@")){
-        FriendData result = await DatabaseService().searchFriendsEmail(searchBar.text);
+        FriendData? result = await DatabaseService().searchFriendsEmail(searchBar.text);
         if(result != null){
           setState(() {
             friendsToDisplay.add(result);
           });
         }
       }else{
-        List<FriendData> friends = await DatabaseService().searchFriendsName(searchBar.text);
+        List<FriendData>? friends = await DatabaseService().searchFriendsName(searchBar.text);
         if(friends != null){
           setState(() {
             friendsToDisplay = friends;

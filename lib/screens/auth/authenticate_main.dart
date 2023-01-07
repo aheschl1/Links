@@ -3,22 +3,36 @@ import 'package:links/screens/auth/login.dart';
 import 'package:links/screens/auth/register.dart';
 
 class Authenticate extends StatefulWidget {
+  const Authenticate({Key? key}) : super(key: key);
+
   @override
   _AuthenticateState createState() => _AuthenticateState();
 }
 
 class _AuthenticateState extends State<Authenticate> {
 
-  bool _showSignIn = false;
+  bool login = false;
 
-  void switchAuth(){
-    setState(() {
-      _showSignIn = !_showSignIn;
-    });
+  void changeState(){
+      setState(() {
+        login = !login;
+      });
   }
 
   @override
   Widget build(BuildContext context) {
-    return _showSignIn ? SignIn (switchAuth) : Register(switchAuth);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Welcome to Links"),
+      ),
+      body: login ? Login(
+          signup: ()=>changeState
+      ) :
+      SignUp(
+        login: ()=>changeState
+      )
+    );
   }
+
 }

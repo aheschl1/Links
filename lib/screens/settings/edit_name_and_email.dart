@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:links/constants/friend_data.dart';
 import 'package:links/services/database_service.dart';
@@ -14,16 +12,16 @@ class EditNameAndEmail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    FriendData me = ModalRoute.of(context).settings.arguments as FriendData;
+    FriendData me = ModalRoute.of(context)!.settings.arguments as FriendData;
     if(nameController.text.isEmpty){
       nameController.text = me.name;
     }
     if(bioController.text.isEmpty){
-      bioController.text = me.bio;
+      bioController.text = me.bio!;
     }
 
     save()async{
-      if(_formKey.currentState.validate()){
+      if(_formKey.currentState!.validate()){
         String newName = nameController.text;
         String newBio = bioController.text;
         String result = await DatabaseService().editNameAndBio(newName, newBio);
@@ -58,7 +56,7 @@ class EditNameAndEmail extends StatelessWidget {
                   TextFormField(
                     controller: nameController,
                     validator: (val){
-                      if(val.length > 2){
+                      if(val!.length > 2){
                         return null;
                       }else{
                         return "Add at least 3 characters";

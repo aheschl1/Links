@@ -2,9 +2,9 @@ class NotificationData{
 
   final String title;
   final String body;
-  String id;
+  String? id;
 
-  NotificationData({this.title, this.body});
+  NotificationData({required this.title, required this.body});
 
   Map<String, dynamic> toMap() {
 

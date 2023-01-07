@@ -1,9 +1,9 @@
 class Tag{
 
   final String name;
-  String id;
+  String? id;
 
-  Tag({this.name});
+  Tag({required this.name});
 
 
   Map<String, dynamic> toMap() {

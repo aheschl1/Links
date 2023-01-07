@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class StageTwo extends StatelessWidget {
-  const StageTwo({Key key}) : super(key: key);
+  const StageTwo({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

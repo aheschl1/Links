@@ -16,13 +16,13 @@ class MineGroups extends StatefulWidget {
 
 class _MineGroupsState extends State<MineGroups> {
   GlobalKey<AnimatedListState> key = GlobalKey<AnimatedListState>();
-  FriendData me;
+  FriendData? me;
 
   openGroup(Group group){
     Navigator.of(context).pushNamed('/view_group', arguments: group);
   }
   getMe()async{
-    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser.uid));
+    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid));
   }
 
   deleteGroup(Group group) async {
@@ -56,7 +56,7 @@ class _MineGroupsState extends State<MineGroups> {
       String result = await DatabaseService().deleteGroup(group);
       if(result == "Deleted successfully"){
         if(group.groupchatId != null){
-          FirebaseMessaging.instance.unsubscribeFromTopic(group.groupchatId);
+          FirebaseMessaging.instance.unsubscribeFromTopic(group.groupchatId!);
         }
       }
       final snackBar = SnackBar(
@@ -95,7 +95,7 @@ class _MineGroupsState extends State<MineGroups> {
     );
 
     if(leave){
-      String result = await DatabaseService().leaveGroup(event.docId);
+      String result = await DatabaseService().leaveGroup(event.docId!);
       final snackBar = SnackBar(
         content: Text(result),
         behavior: SnackBarBehavior.floating, // Add this line
@@ -119,10 +119,10 @@ class _MineGroupsState extends State<MineGroups> {
     String result;
 
 
-    if(!group.requireConfirmation){
+    if(!group.requireConfirmation!){
       result = await DatabaseService().joinGroup(group);
     }else{
-      Request request = Request(userId: FirebaseAuth.instance.currentUser.uid, decision: Request.PENDING, userEmail: me.email, userName: me.name);
+      Request request = Request(userId: FirebaseAuth.instance.currentUser!.uid, decision: Request.PENDING, userEmail: me!.email, userName: me!.name);
       result = await DatabaseService().requestToJoinGroup(group, request);
     }
 
@@ -153,7 +153,9 @@ class _MineGroupsState extends State<MineGroups> {
     getMe();
 
     return Container(
-      child: Column(
+      child: ListView(
+        physics: ClampingScrollPhysics(),
+        shrinkWrap: true,
         children: [
           ExpansionTile(
             leading: Icon(Icons.person),
@@ -163,10 +165,9 @@ class _MineGroupsState extends State<MineGroups> {
                 future: DatabaseService().getMyGroupsCreated(),
                 builder: (context, snapshot){
 
-                  List<Group> eventsToDisplay = [];
-                  eventsToDisplay = snapshot.data;
-
                   if(snapshot.connectionState == ConnectionState.done){
+                    List<Group> eventsToDisplay = [];
+                    eventsToDisplay = snapshot.data!;
                     return eventsToDisplay.length == 0 ?
                     TextButton.icon(label: Text("You have not created any groups yet"), icon: Icon(Icons.refresh), onPressed: (){setState(() {
 
@@ -207,10 +208,9 @@ class _MineGroupsState extends State<MineGroups> {
                 future: DatabaseService().getMyGroupsIn(),
                 builder: (context, snapshot){
 
-                  List<Group> eventsToDisplay = [];
-                  eventsToDisplay = snapshot.data;
-
                   if(snapshot.connectionState == ConnectionState.done){
+                    List<Group> eventsToDisplay = [];
+                    eventsToDisplay = snapshot.data!;
                     return eventsToDisplay.length == 0 ?
                     TextButton.icon(label: Text("You have not joined any groups yet"), icon: Icon(Icons.refresh), onPressed: (){setState(() {
 
@@ -251,7 +251,7 @@ class _MineGroupsState extends State<MineGroups> {
                 future: DatabaseService().getPrivateGroupsToDisplay(15),
                 builder: (context, snapshot){
 
-                  List<Group> groupsToDisplay = [];
+                  List<Group>? groupsToDisplay = [];
 
                   if(snapshot.connectionState == ConnectionState.done){
                     groupsToDisplay = snapshot.data;
@@ -262,10 +262,10 @@ class _MineGroupsState extends State<MineGroups> {
                         : SizedBox(
                       height: 300,
                       child:  AnimatedList(
-                        initialItemCount: groupsToDisplay.length,
+                        initialItemCount: groupsToDisplay!.length,
                         key: key,
                         itemBuilder: (context, int index, animation){
-                          Group group = groupsToDisplay[index];
+                          Group group = groupsToDisplay![index];
                           return Dismissible(
 
                             onDismissed: (direction){
@@ -282,13 +282,13 @@ class _MineGroupsState extends State<MineGroups> {
                               group: group,
                               join: (){
                                 joinGroup(group);
-                                snapshot.data.removeAt(index);
-                                key.currentState.removeItem(index, (context,animation)=>SizedBox());
+                                snapshot.data!.removeAt(index);
+                                key.currentState!.removeItem(index, (context,animation)=>SizedBox());
                               },
                               notInterested: () {
                                 notInterestedInGroup(group);
-                                snapshot.data.removeAt(index);
-                                key.currentState.removeItem(index, (context,animation)=>SizedBox());
+                                snapshot.data!.removeAt(index);
+                                key.currentState!.removeItem(index, (context,animation)=>SizedBox());
                               },
                             ),
 
@@ -344,7 +344,7 @@ class _MineGroupsState extends State<MineGroups> {
                 future: DatabaseService().getRequestsPendingGroups(),
                 builder: (context, snapshot){
 
-                  List<Request> requestsToDisplay = [];
+                  List<Request>? requestsToDisplay = [];
 
                   if(snapshot.connectionState == ConnectionState.done){
 
@@ -357,10 +357,10 @@ class _MineGroupsState extends State<MineGroups> {
                         : SizedBox(
                       height: 300,
                       child:  AnimatedList(
-                        initialItemCount: requestsToDisplay.length,
+                        initialItemCount: requestsToDisplay!.length,
                         key: key,
                         itemBuilder: (context, int index, animation){
-                          Request request = requestsToDisplay[index];
+                          Request request = requestsToDisplay![index];
                           return ViewRequestGroup(request: request, ok: ()=>dismissRequest(request));
                         },
                       ),

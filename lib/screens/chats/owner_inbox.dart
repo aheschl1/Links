@@ -4,7 +4,7 @@ import 'package:links/constants/event.dart';
 import 'package:links/constants/friend_data.dart';
 import 'package:links/screens/loading.dart';
 import 'package:links/services/database_service.dart';
-import 'package:searchable_dropdown/searchable_dropdown.dart';
+import 'package:search_choices/search_choices.dart';
 
 class OwnerInbox extends StatefulWidget {
   @override
@@ -15,7 +15,7 @@ class _OwnerInboxState extends State<OwnerInbox> {
 
   final key = GlobalKey<AnimatedListState>();
 
-  Event event;
+  Event? event;
   List<FriendData> peopleInGroup = [];
 
   openMessage(FriendData data){
@@ -23,7 +23,7 @@ class _OwnerInboxState extends State<OwnerInbox> {
   }
 
   getAllUserForMessage()async{
-    List<FriendData> people = await DatabaseService().getUsersInGroup(event);
+    List<FriendData> people = await DatabaseService().getUsersInGroup(event!);
     setState(() {
       peopleInGroup = people;
     });
@@ -32,7 +32,7 @@ class _OwnerInboxState extends State<OwnerInbox> {
   @override
   Widget build(BuildContext context) {
 
-    event = ModalRoute.of(context).settings.arguments as Event;
+    event = ModalRoute.of(context)!.settings.arguments as Event;
 
     if(peopleInGroup.isEmpty){
       getAllUserForMessage();
@@ -40,19 +40,19 @@ class _OwnerInboxState extends State<OwnerInbox> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("${event.title} inbox"),
+        title: Text("${event!.title} inbox"),
       ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child:  SearchableDropdown.single(
+            child:  SearchChoices.single(
               icon: Icon(Icons.search),
               isExpanded: true,
               hint: "Start a conversation",
               items: peopleInGroup.map((item){
                 return new DropdownMenuItem(
-                  child: Text(item.name),
+                  child: Text(item.name!),
                   value: item,
                 );
               }
@@ -76,7 +76,7 @@ class _OwnerInboxState extends State<OwnerInbox> {
                   return Loading();
                 }
 
-                List<FriendData> friends = snapshot.data;
+                List<FriendData> friends = snapshot.data!;
 
                 return friends.length == 0 ?
 
@@ -92,7 +92,7 @@ class _OwnerInboxState extends State<OwnerInbox> {
                       padding: const EdgeInsets.all(8.0),
                       child: Card(
                         child: InkWell(
-                          onTap: ()=>openMessage(data),
+                          onTap: openMessage(data),
                           child: Padding(
                             padding: const EdgeInsets.all(20),
                             child: Row(
@@ -100,7 +100,7 @@ class _OwnerInboxState extends State<OwnerInbox> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    data.name,
+                                    data.name!,
                                     style: TextStyle(
                                       fontSize: 18
                                     ),
@@ -109,7 +109,7 @@ class _OwnerInboxState extends State<OwnerInbox> {
                                 Padding(
                                   padding: const EdgeInsets.fromLTRB(0, 0, 18, 0),
                                   child: Text(
-                                    data.email,
+                                    data.email!,
                                     style: TextStyle(
                                       fontSize: 13
                                     ),

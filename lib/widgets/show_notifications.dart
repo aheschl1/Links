@@ -29,7 +29,7 @@ class _ShowNotificationsState extends State<ShowNotifications> {
           if(snapshot.hasError || snapshot.connectionState == ConnectionState.waiting){
             return SpinKitFoldingCube(color: Colors.white,);
           }
-          if(snapshot.data.length == 0){
+          if(snapshot.data!.length == 0){
             return SizedBox(
               height: double.infinity,
               child: Padding(
@@ -45,9 +45,9 @@ class _ShowNotificationsState extends State<ShowNotifications> {
             );
           }
           return ListView.builder(
-            itemCount: snapshot.data.length,
+            itemCount: snapshot.data!.length,
             itemBuilder: (context, index){
-              NotificationData notificationData = snapshot.data[index];
+              NotificationData notificationData = snapshot.data![index];
               return Padding(
                 padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
                 child: Dismissible(

@@ -5,7 +5,7 @@ class ViewBlog extends StatelessWidget {
 
   final BlogPost blog;
 
-  ViewBlog({this.blog});
+  ViewBlog({required this.blog});
   @override
   Widget build(BuildContext context) {
     return Padding(

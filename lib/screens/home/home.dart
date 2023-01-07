@@ -15,13 +15,13 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   bool newNotifications = false;
 
-  PageController _pageController;
+  PageController? _pageController;
   int selectedScreenIndex = 0;
 
   changeIndex(int i) {
     setState(() {
       selectedScreenIndex = i;
-      _pageController.animateToPage(0,
+      _pageController!.animateToPage(0,
           duration: Duration(milliseconds: 500), curve: Curves.easeOut);
     });
   }
@@ -51,16 +51,13 @@ class _HomeState extends State<Home> {
     getNewNotification();
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Got a message whilst in the foreground!');
 
       if (message.data['unsubscribe'] != null) {
-        print(message.data['unsubscribe']);
         FirebaseMessaging.instance
             .unsubscribeFromTopic(message.data['unsubscribe']);
       }
 
       if (message.data['subscribe'] != null) {
-        print(message.data['subscribe']);
         FirebaseMessaging.instance.subscribeToTopic(message.data['subscribe']);
       }
 
@@ -96,7 +93,7 @@ class _HomeState extends State<Home> {
               onPressed: () {
                 setState(() {
                   selectedScreenIndex = 0;
-                  _pageController.animateToPage(0,
+                  _pageController!.animateToPage(0,
                       duration: Duration(milliseconds: 500),
                       curve: Curves.easeOut);
                 });
@@ -115,7 +112,7 @@ class _HomeState extends State<Home> {
               onPressed: () {
                 setState(() {
                   selectedScreenIndex = 2;
-                  _pageController.animateToPage(2,
+                  _pageController!.animateToPage(2,
                       duration: Duration(milliseconds: 500),
                       curve: Curves.easeOut);
                 });
@@ -185,7 +182,7 @@ class _HomeState extends State<Home> {
         onPressed: () {
           setState(() {
             selectedScreenIndex = 1;
-            _pageController.animateToPage(1,
+            _pageController!.animateToPage(1,
                 duration: Duration(milliseconds: 500), curve: Curves.easeOut);
           });
         },

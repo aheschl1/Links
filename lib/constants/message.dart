@@ -2,11 +2,11 @@
 class Message{
 
   String content;
-  String senderDisplayName;
-  String senderUid;
+  String? senderDisplayName;
+  String? senderUid;
   int timeStamp;
 
-  Message({this.content, this.senderDisplayName, this.senderUid, this.timeStamp});
+  Message({required this.content, this.senderDisplayName, this.senderUid, required this.timeStamp});
 
   Map<String, dynamic> toMap() {
     return {
@@ -17,9 +17,9 @@ class Message{
     };
   }
 
-  static Message fromMap(Map data) {
+  static Message fromMap(Map? data) {
     return Message(
-      content: data['content'],
+      content: data!['content'],
       senderDisplayName: data['senderDisplayName'],
       senderUid: data['senderUid'],
       timeStamp: data['timeStamp'],

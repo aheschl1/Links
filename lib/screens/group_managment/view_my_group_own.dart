@@ -23,7 +23,7 @@ class MyGroupOwn extends StatefulWidget {
 
   final Group group;
 
-  MyGroupOwn({this.group});
+  MyGroupOwn({required this.group});
 
   @override
   _MyGroupOwnState createState() => _MyGroupOwnState();
@@ -31,7 +31,7 @@ class MyGroupOwn extends StatefulWidget {
 
 class _MyGroupOwnState extends State<MyGroupOwn> {
 
-  FriendData me;
+  FriendData? me;
   final key = GlobalKey<AnimatedListState>();
 
   managePeople(){
@@ -49,7 +49,7 @@ class _MyGroupOwnState extends State<MyGroupOwn> {
 
   removeUser(FriendData user) async
   {
-    String result = await DatabaseService().kickFromGroup(userId: user.userId, eventId: widget.group.docId);
+    String result = await DatabaseService().kickFromGroup(userId: user.userId!, eventId: widget.group.docId);
     final snackBar = SnackBar(content: Text(result));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
     setState((){});
@@ -68,7 +68,7 @@ class _MyGroupOwnState extends State<MyGroupOwn> {
         appBar: AppBar(
           title: Text("Create event for group"),
         ),
-        body: Create(group: widget.group,),
+        body: Create(group: widget.group, changeIndex: (int){},),
       )
     ).then((value) {
       setState(() {
@@ -128,7 +128,7 @@ class _MyGroupOwnState extends State<MyGroupOwn> {
       String result = await DatabaseService().deleteEventInGroup(event, widget.group);
       if(result == "Deleted successfully"){
         if(event.groupChatEnabledID != null){
-          FirebaseMessaging.instance.unsubscribeFromTopic(event.groupChatEnabledID);
+          FirebaseMessaging.instance.unsubscribeFromTopic(event.groupChatEnabledID!);
         }
       }
       final snackBar = SnackBar(
@@ -180,13 +180,13 @@ class _MyGroupOwnState extends State<MyGroupOwn> {
   joinEvent(Event event) async {
     String result;
 
-    if(double.parse(event.admissionPrice) > 0){
+    if(double.parse(event.admissionPrice!) > 0){
       Navigator.of(context).pushNamed("/payments", arguments: event);
     }else{
-      if(!event.requireConfirmation){
+      if(event.requireConfirmation == null || !event.requireConfirmation!){
         result = await DatabaseService().joinGroupEvent(event, widget.group);
       }else{
-        Request request = Request(userId: FirebaseAuth.instance.currentUser.uid, decision: Request.PENDING, userEmail: me.email, userName: me.name);
+        Request request = Request(userId: FirebaseAuth.instance.currentUser!.uid, decision: Request.PENDING, userEmail: me!.email, userName: me!.name);
         result = await DatabaseService().requestToJoinGroupEvent(event, request, widget.group);
       }
 
@@ -210,7 +210,7 @@ class _MyGroupOwnState extends State<MyGroupOwn> {
     }
     final snackBar = SnackBar(content: Text(result));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    key.currentState.removeItem(index, (context,animation)=>SizedBox());
+    key.currentState!.removeItem(index, (context,animation)=>SizedBox());
   }
 
   denyRequest(Request request) async {
@@ -238,7 +238,7 @@ class _MyGroupOwnState extends State<MyGroupOwn> {
               if(snapshot.hasError || snapshot.connectionState == ConnectionState.waiting){
                 return SpinKitFoldingCube(color: Colors.white,);
               }
-              if(snapshot.data.length == 0){
+              if(snapshot.data!.length == 0){
                 return SizedBox(
                   height: double.infinity,
                   child: Padding(
@@ -254,7 +254,7 @@ class _MyGroupOwnState extends State<MyGroupOwn> {
                 );
               }
 
-              List<Request> requests = snapshot.data;
+              List<Request> requests = snapshot.data!;
 
               return AnimatedList(
                   key: key,
@@ -284,8 +284,8 @@ class _MyGroupOwnState extends State<MyGroupOwn> {
 
                           ),
                           tileColor: Colors.white24,
-                          title: Text(requests[index].userName),
-                          subtitle: Text(requests[index].userEmail),
+                          title: Text(requests[index].userName!),
+                          subtitle: Text(requests[index].userEmail!),
                         ),
                       ),
                     );
@@ -300,7 +300,7 @@ class _MyGroupOwnState extends State<MyGroupOwn> {
   }
 
   getMe()async{
-    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser.uid));
+    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid));
   }
 
   dismissRequest(Request request) async {
@@ -367,179 +367,192 @@ class _MyGroupOwnState extends State<MyGroupOwn> {
           )
         ],
       ),
-      body: Column(
-        children: [
-          GroupMyPage(widget.group),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: StreamBuilder<Object>(
+        stream: widget.group.liveUpdate,
+        builder: (context, snapshot) {
+
+          if(snapshot.connectionState == ConnectionState.waiting){
+            return Center(
+              child: SpinKitFoldingCube(color: Colors.white,),
+            );
+          }
+
+          Group group = snapshot.data as Group;
+
+          return Column(
             children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton.icon(
-                    icon: Icon(Icons.group),
-                    label: Text("Group chat"),
-                    onPressed: widget.group.groupchatId == null ? null : (){openGroupchat();},
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+              GroupMyPage(group),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton.icon(
+                        icon: Icon(Icons.group),
+                        label: Text("Group chat"),
+                        onPressed: group.groupchatId == null ? null : (){openGroupchat();},
+                        style: ButtonStyle(
+                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                            )
+                          ),
+                            backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+                              return Colors.blueGrey;
+                            },),
                         )
                       ),
-                        backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
-                          return Colors.blueGrey;
-                        },),
-                    )
+                    ),
                   ),
-                ),
+                  !group.requireConfirmation! ? SizedBox() : Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton.icon(
+                        icon: Icon(Icons.all_inbox_rounded),
+                        label: Text("Requests"),
+                        onPressed: ()=>showRequests(),
+                        style: ButtonStyle(
+                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            )
+                          ),
+                          backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+                                return Colors.blueAccent;
+                            },
+                          ),
+                        )
+                      ),
+                    ),
+                  )
+                ],
               ),
-              !widget.group.requireConfirmation ? SizedBox() : Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton.icon(
-                    icon: Icon(Icons.all_inbox_rounded),
-                    label: Text("Requests"),
-                    onPressed: ()=>showRequests(),
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        )
-                      ),
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
-                            return Colors.blueAccent;
-                        },
-                      ),
-                    )
-                  ),
-                ),
-              )
-            ],
-          ),
-          ExpansionTile(
-            leading: Icon(Icons.event),
-            title: Text("Upcoming events"),
-            children: [
-              FutureBuilder<List<Event>>(
-                future: DatabaseService().getEventsInGroup(widget.group),
-                builder: (context, snapshot){
-                  if(snapshot.connectionState != ConnectionState.done){
-                    return SizedBox(height: 100, child: SpinKitFoldingCube(color: Colors.white,),);
-                  }
+              ExpansionTile(
+                leading: Icon(Icons.event),
+                title: Text("Upcoming events"),
+                children: [
+                  FutureBuilder<List<Event>>(
+                    future: DatabaseService().getEventsInGroup(group),
+                    builder: (context, snapshot){
+                      if(snapshot.connectionState != ConnectionState.done){
+                        return SizedBox(height: 100, child: SpinKitFoldingCube(color: Colors.white,),);
+                      }
 
-                  if(snapshot.data.length == 0){
-                    return TextButton.icon(label: Text("There are no upcoming events in this group"), icon: Icon(Icons.refresh), onPressed: (){setState(() {
+                      if(snapshot.data!.length == 0){
+                        return TextButton.icon(label: Text("There are no upcoming events in this group"), icon: Icon(Icons.refresh), onPressed: (){setState(() {
 
-                    });},);
-                  }
+                        });},);
+                      }
 
-                  return SizedBox(
-                    height: 300,
-                    child: ListView.builder(
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (context, index){
-                        Event event = snapshot.data[index];
-                        User user = FirebaseAuth.instance.currentUser;
-                        if(event.owner == user.uid){
-                          return MyEventWidget(event: event, more: ()=> openEvent(event), deleteEvent: ()=> deleteEvent(event),);
-                        }else if(!(event.usersIn == null) && event.usersIn.contains(user.uid)){
-                          return MyEventIn(
-                            event: event,
-                            more: ()=>openEvent(event),
-                            leaveEvent: ()=>leaveEvent(event),
-                          );
-                        }else{
-                          return EventWidget(
-                            event: event,
-                            notInterested: ()=>notInterestedInEvent(event),
-                            join: ()=>joinEvent(event),
-                          );
+                      return SizedBox(
+                        height: 300,
+                        child: ListView.builder(
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index){
+                            Event event = snapshot.data![index];
+                            User user = FirebaseAuth.instance.currentUser!;
+                            if(event.owner == user.uid){
+                              return MyEventWidget(event: event, more: ()=> openEvent(event), deleteEvent: ()=> deleteEvent(event),);
+                            }else if(!(event.usersIn == null) && event.usersIn!.contains(user.uid)){
+                              return MyEventIn(
+                                event: event,
+                                more: ()=>openEvent(event),
+                                leaveEvent: ()=>leaveEvent(event),
+                              );
+                            }else{
+                              return EventWidget(
+                                event: event,
+                                notInterested: ()=>notInterestedInEvent(event),
+                                join: ()=>joinEvent(event),
+                              );
+                            }
+
+                          },
+                        ),
+                      );
+
+                    },
+                  )
+                ]
+              ),
+              ExpansionTile(
+                  leading: Icon(Icons.timer),
+                  title: Text("Pending event requests"),
+                  children: [
+                    FutureBuilder<List<Request>>(
+                      future: DatabaseService().getRequestsGEPending(group),
+                      builder: (context, snapshot){
+                        if(snapshot.connectionState != ConnectionState.done){
+                          return SizedBox(height: 100, child: SpinKitFoldingCube(color: Colors.white,),);
                         }
 
+                        if(snapshot.data!.length == 0){
+                          return TextButton.icon(label: Text("There are no upcoming events in this group"), icon: Icon(Icons.refresh), onPressed: (){setState(() {
+
+                          });},);
+                        }
+
+
+                        return SizedBox(
+                          height: 300,
+                          child: ListView.builder(
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index){
+                              Request request = snapshot.data![index];
+                              return ViewRequest(
+                                ok: ()=>dismissRequest(request),
+                                request: request,
+                              );
+
+                            },
+                          ),
+                        );
+
                       },
-                    ),
-                  );
+                    )
+                  ]
+              ),
+              ExpansionTile(
+                  leading: Icon(Icons.description_outlined),
+                  title: Text("Blog posts"),
+                  children: [
+                    FutureBuilder<List<BlogPost>>(
+                      future: DatabaseService().getBlogPosts(group),
+                      builder: (context, snapshot){
+                        if(snapshot.connectionState != ConnectionState.done){
+                          return SizedBox(height: 100, child: SpinKitFoldingCube(color: Colors.white,),);
+                        }
 
-                },
+                        if(snapshot.data!.length == 0){
+                          return TextButton.icon(label: Text("There are no blog posts in this group"), icon: Icon(Icons.refresh), onPressed: (){setState(() {
+
+                          });},);
+                        }
+
+                        return SizedBox(
+                          height: 300,
+                          child: ListView.builder(
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index){
+                              BlogPost blog = snapshot.data![index];
+                              return BlogWidget(
+                                blog: blog,
+                                more: ()=>viewBlog(blog),
+                                delete: ()=>deleteBlog(blog),
+                              );
+                            },
+                          ),
+                        );
+
+                      },
+                    )
+                  ]
               )
-            ]
-          ),
-          ExpansionTile(
-              leading: Icon(Icons.timer),
-              title: Text("Pending event requests"),
-              children: [
-                FutureBuilder<List<Request>>(
-                  future: DatabaseService().getRequestsGEPending(widget.group),
-                  builder: (context, snapshot){
-                    if(snapshot.connectionState != ConnectionState.done){
-                      return SizedBox(height: 100, child: SpinKitFoldingCube(color: Colors.white,),);
-                    }
 
-                    if(snapshot.data.length == 0){
-                      return TextButton.icon(label: Text("There are no upcoming events in this group"), icon: Icon(Icons.refresh), onPressed: (){setState(() {
-
-                      });},);
-                    }
-
-                    print(snapshot.data);
-
-                    return SizedBox(
-                      height: 300,
-                      child: ListView.builder(
-                        itemCount: snapshot.data.length,
-                        itemBuilder: (context, index){
-                          Request request = snapshot.data[index];
-                          return ViewRequest(
-                            ok: ()=>dismissRequest(request),
-                            request: request,
-                          );
-
-                        },
-                      ),
-                    );
-
-                  },
-                )
-              ]
-          ),
-          ExpansionTile(
-              leading: Icon(Icons.description_outlined),
-              title: Text("Blog posts"),
-              children: [
-                FutureBuilder<List<BlogPost>>(
-                  future: DatabaseService().getBlogPosts(widget.group),
-                  builder: (context, snapshot){
-                    if(snapshot.connectionState != ConnectionState.done){
-                      return SizedBox(height: 100, child: SpinKitFoldingCube(color: Colors.white,),);
-                    }
-
-                    if(snapshot.data.length == 0){
-                      return TextButton.icon(label: Text("There are no blog posts in this group"), icon: Icon(Icons.refresh), onPressed: (){setState(() {
-
-                      });},);
-                    }
-
-                    return SizedBox(
-                      height: 300,
-                      child: ListView.builder(
-                        itemCount: snapshot.data.length,
-                        itemBuilder: (context, index){
-                          BlogPost blog = snapshot.data[index];
-                          return BlogWidget(
-                            blog: blog,
-                            more: ()=>viewBlog(blog),
-                            delete: ()=>deleteBlog(blog),
-                          );
-                        },
-                      ),
-                    );
-
-                  },
-                )
-              ]
-          )
-
-        ],
+            ],
+          );
+        }
       ),
     );
   }

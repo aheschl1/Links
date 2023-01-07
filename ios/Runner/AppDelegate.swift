@@ -17,7 +17,7 @@ import Braintree
       UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
     }
 
-    GMSServices.provideAPIKey("AIzaSyDavOnmlKHv2dKYcPmxoNCMnl9foHeKftY")
+    GMSServices.provideAPIKey("AIzaSyDQsi3TnwIWsNl_IJs63sIzw__418mSlKE")
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

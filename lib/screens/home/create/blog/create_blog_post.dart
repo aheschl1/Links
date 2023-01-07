@@ -11,7 +11,7 @@ class CreateBlog extends StatefulWidget {
 
   final Group group;
 
-  CreateBlog({this.group});
+  CreateBlog({required this.group});
 
   @override
   _CreateBlogState createState() => _CreateBlogState();
@@ -22,20 +22,20 @@ class _CreateBlogState extends State<CreateBlog> {
   final _formKey = GlobalKey<FormState>();
   String title = '';
   String content = '';
-  FriendData me;
+  FriendData? me;
   DateTime dateTime = DateTime.now();
 
   save() async {
-    if(_formKey.currentState.validate()){
+    if(_formKey.currentState!.validate()){
       String format = DateFormat.yMMMEd().format(dateTime);
       BlogPost blogPost = BlogPost(
         title: title,
         content: content,
-        ownerName: me.name,
-        owner: FirebaseAuth.instance.currentUser.uid,
+        ownerName: me!.name,
+        owner: FirebaseAuth.instance.currentUser!.uid,
         date: format,
       );
-      String result = await DatabaseService().createBlogPost(widget.group, blogPost);
+      String? result = await DatabaseService().createBlogPost(widget.group, blogPost);
       final snackBar = SnackBar(
         content: Text(result != null ? "Blog posted" : "Something went wrong"),
         behavior: SnackBarBehavior.floating, // Add this line
@@ -46,7 +46,7 @@ class _CreateBlogState extends State<CreateBlog> {
   }
 
   getMe()async{
-    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser.uid));
+    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid));
   }
 
   @override
@@ -68,7 +68,7 @@ class _CreateBlogState extends State<CreateBlog> {
               TextFormField(
                 style: TextStyle(color: Colors.black),
                 validator: (text){
-                  if(text.length == 0){
+                  if(text!.length == 0){
                     return 'Enter a title';
                   }
                   return null;
@@ -87,7 +87,7 @@ class _CreateBlogState extends State<CreateBlog> {
                   minLines: 100,
                   maxLines: 100,
                   validator: (text){
-                    if(text.length < 30){
+                    if(text!.length < 30){
                       return 'Enter at least 30 characters';
                     }
                     return null;

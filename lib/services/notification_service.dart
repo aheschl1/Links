@@ -4,25 +4,25 @@ class NotificationService{
   String title;
   String body;
 
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  FlutterLocalNotificationsPlugin? flutterLocalNotificationsPlugin;
 
 
-  NotificationService({this.title, this.body}){
+  NotificationService({required this.title, required this.body}){
 
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     var initializationSettingsAndroid = AndroidInitializationSettings('icon');
-    var initializationSettingsIOs = IOSInitializationSettings();
+    var initializationSettingsIOs = DarwinInitializationSettings();
 
     var initSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOs);
 
-    flutterLocalNotificationsPlugin.initialize(initSettings);
+    flutterLocalNotificationsPlugin!.initialize(initSettings);
 
   }
 
   showNotification() async {
-    var android = AndroidNotificationDetails('0', 'event_posted ', 'New event posted');
-    var iOS = IOSNotificationDetails();
+    var android = AndroidNotificationDetails('0', 'event_posted ', subText: 'Event Posted');
+    var iOS = DarwinNotificationDetails();
     var platform = new NotificationDetails(android: android, iOS: iOS);
-    await flutterLocalNotificationsPlugin.show(0, title, body, platform,);
+    await flutterLocalNotificationsPlugin!.show(0, title, body, platform,);
   }
 }

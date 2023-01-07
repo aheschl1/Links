@@ -21,13 +21,13 @@ class _SettingsState extends State<Settings> {
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  FriendData me;
-  UserData myData;
-  AccountLevels accountLevelStatus;
+  FriendData? me;
+  UserData? myData;
+  AccountLevels? accountLevelStatus;
 
   void getMyData() async {
-    String uid = FirebaseAuth.instance.currentUser.uid;
-    UserData data = await DatabaseService().getUserPreferences(uid);
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    UserData? data = await DatabaseService().getUserPreferences(uid);
     Map map = await DatabaseService().getUser(uid);
     setState(() {
       me = FriendData.fromMap(map);
@@ -66,7 +66,7 @@ class _SettingsState extends State<Settings> {
     showModalBottomSheet(
       context: context,
         builder: (context) => Container(
-          height: 400,
+          height: 1500,
           width: double.infinity,
           child: AddFriends()
       ),
@@ -106,7 +106,7 @@ class _SettingsState extends State<Settings> {
     showModalBottomSheet(
       context: context,
       builder: (context){
-        return AccountLevel(accountLevelCurrent:accountLevelStatus);
+        return AccountLevel(accountLevelCurrent:accountLevelStatus!);
       }
     );
 
@@ -142,7 +142,7 @@ class _SettingsState extends State<Settings> {
                   child: Column(
                     children: [
                       Text(
-                        me != null ? me.name : "Name",
+                        me != null ? me!.name : "Name",
                         style: TextStyle(
                           letterSpacing: 1,
                           fontSize: 25
@@ -150,7 +150,7 @@ class _SettingsState extends State<Settings> {
                       ),
                       SizedBox(height: 10,),
                       Text(
-                        me != null ? me.email : "Email",
+                        me != null ? me!.email : "Email",
                         style: TextStyle(
                             letterSpacing: 1,
                         ),
@@ -159,7 +159,7 @@ class _SettingsState extends State<Settings> {
                       Flexible(
                         flex: 0,
                         child: Text(
-                          me != null ? me.bio : "Bio",
+                          me != null ? me!.bio! : "Bio",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontStyle: FontStyle.italic,
@@ -193,7 +193,7 @@ class _SettingsState extends State<Settings> {
                 child: ListTile(
                   leading: Icon(Icons.person_add, color: Colors.blue, size: 30.0),
                   title: Text(
-                    "You have ${myData!=null&&myData.following!=null?myData.following.length:0} ${myData!=null&&myData.following!=null && myData.following.length == 1 ? " friend" : " friends"}",
+                    "You have ${myData!=null&&myData!.following!=null?myData!.following!.length:0} ${myData!=null&&myData!.following!=null && myData!.following!.length == 1 ? " friend" : " friends"}",
                     style: TextStyle(
                         fontSize: 15
                     ),

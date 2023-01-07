@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
+import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:intl/intl.dart';
 import 'package:links/constants/event.dart';
 import 'package:place_picker/place_picker.dart';
 
 class EnterLocationAndDate extends StatefulWidget {
 
-  final Function finished;
+  final Function(Event) finished;
   final Event event;
 
-  EnterLocationAndDate({this.finished, this.event});
+  EnterLocationAndDate({required this.finished, required this.event});
 
   @override
   _EnterLocationAndDateState createState() => _EnterLocationAndDateState();
@@ -21,13 +21,13 @@ class _EnterLocationAndDateState extends State<EnterLocationAndDate> {
   DateTime dateTime = DateTime.now();
   String currentTime = "12:00 PM";
   String currentEndTime = "1:00 PM";
-  GeoFirePoint point;
+  GeoFirePoint? point;
 
-  final kGoogleApiKey = "AIzaSyDavOnmlKHv2dKYcPmxoNCMnl9foHeKftY";
+  final kGoogleApiKey = "AIzaSyDQsi3TnwIWsNl_IJs63sIzw__418mSlKE";
   final _formKey = GlobalKey<FormState>();
 
   done(){
-    if(_formKey.currentState.validate()){
+    if(_formKey.currentState!.validate()){
       String format = DateFormat.yMMMEd().format(dateTime);
       widget.event.date = format;
       widget.event.dateStamp = dateTime.millisecondsSinceEpoch;
@@ -45,8 +45,8 @@ class _EnterLocationAndDateState extends State<EnterLocationAndDate> {
     ));
 
     // Handle the result in your way
-    textEditingController.text = result.formattedAddress;
-    point = Geoflutterfire().point(latitude: result.latLng.latitude, longitude:  result.latLng.longitude);
+    textEditingController.text = result.formattedAddress!;
+    point = GeoFlutterFire().point(latitude: result.latLng!.latitude, longitude:  result.latLng!.longitude);
   }
 
   @override
@@ -63,7 +63,7 @@ class _EnterLocationAndDateState extends State<EnterLocationAndDate> {
               child: TextFormField(
                 style: TextStyle(color: Colors.black),
                 validator: (val){
-                  if(val.isEmpty){
+                  if(val!.isEmpty){
                     return "Select a location";
                   }else{
                     return null;
@@ -101,12 +101,12 @@ class _EnterLocationAndDateState extends State<EnterLocationAndDate> {
                 children: [
                   ElevatedButton.icon(
                     onPressed: () async {
-                      final TimeOfDay newTime = await showTimePicker(
+                      final TimeOfDay? newTime = await showTimePicker(
                         context: context,
                         initialTime: TimeOfDay.now(),
                       );
                       setState(() {
-                        currentTime = newTime.format(context);
+                        currentTime = newTime!.format(context);
                       });
                     },
                     style: ButtonStyle(
@@ -127,12 +127,12 @@ class _EnterLocationAndDateState extends State<EnterLocationAndDate> {
                   Text(" to "),
                   ElevatedButton.icon(
                     onPressed: () async {
-                      final TimeOfDay newTime = await showTimePicker(
+                      final TimeOfDay? newTime = await showTimePicker(
                         context: context,
                         initialTime: TimeOfDay.now(),
                       );
                       setState(() {
-                        currentEndTime = newTime.format(context);
+                        currentEndTime = newTime!.format(context);
                       });
                     },
                     style: ButtonStyle(

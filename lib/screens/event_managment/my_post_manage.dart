@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:links/constants/event.dart';
@@ -10,7 +9,7 @@ import 'package:links/widgets/user_in_group.dart';
 
 class ManageMyPost extends StatefulWidget {
 
-  final Event event;
+  final Event? event;
 
   ManageMyPost({this.event});
 
@@ -21,7 +20,7 @@ class ManageMyPost extends StatefulWidget {
 class _ManageMyPostState extends State<ManageMyPost> {
 
   final key = GlobalKey<AnimatedListState>();
-  Event eventNew;
+  Event? eventNew;
 
   openGroupchat(){
     Navigator.of(context).pushNamed('/groupchat', arguments: eventNew == null ? widget.event : eventNew);
@@ -33,10 +32,10 @@ class _ManageMyPostState extends State<ManageMyPost> {
 
   removeUser(FriendData user) async
   {
-    String result = await DatabaseService().kickFromEvent(userId: user.userId, eventId: widget.event.docId);
+    String result = await DatabaseService().kickFromEvent(userId: user.userId!, eventId: widget.event!.docId!);
     final snackBar = SnackBar(content: Text(result));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    eventNew = await DatabaseService().getOneTimeEvent(widget.event.docId);
+    eventNew = await DatabaseService().getOneTimeEvent(widget.event!.docId!);
     setState((){});
   }
 
@@ -80,7 +79,7 @@ class _ManageMyPostState extends State<ManageMyPost> {
       }
       final snackBar = SnackBar(content: Text(result));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      key.currentState.removeItem(index, (context,animation)=>SizedBox());
+      key.currentState!.removeItem(index, (context,animation)=>SizedBox());
       Navigator.of(context).pop();
     }
   }
@@ -113,7 +112,7 @@ class _ManageMyPostState extends State<ManageMyPost> {
     );
 
     if(confirm){
-      String result = await DatabaseService().denyRequestStatus(widget.event, request);
+      String result = await DatabaseService().denyRequestStatus(widget.event!, request);
       final snackBar = SnackBar(content: Text(result));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       Navigator.of(context).pop();
@@ -126,12 +125,12 @@ class _ManageMyPostState extends State<ManageMyPost> {
         context: context,
         builder: (context){
           return FutureBuilder<List<Request>>(
-            future: DatabaseService().getRequests(widget.event),
+            future: DatabaseService().getRequests(widget.event!),
             builder: (context, snapshot){
               if(snapshot.hasError || snapshot.connectionState == ConnectionState.waiting){
                 return SpinKitFoldingCube(color: Colors.white,);
               }
-              if(snapshot.data.length == 0){
+              if(snapshot.data!.length == 0){
                 return SizedBox(
                   height: double.infinity,
                   child: Padding(
@@ -147,11 +146,11 @@ class _ManageMyPostState extends State<ManageMyPost> {
                 );
               }
 
-              List<Request> requests = snapshot.data;
+              List<Request>? requests = snapshot.data;
 
               return AnimatedList(
                   key: key,
-                  initialItemCount: requests.length,
+                  initialItemCount: requests!.length,
                   itemBuilder: (context, index, animation){
 
                     return Padding(
@@ -161,9 +160,9 @@ class _ManageMyPostState extends State<ManageMyPost> {
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
                             children: [
-                              Text(requests[index].userName),
+                              Text(requests[index].userName!),
                               SizedBox(width:10),
-                              Text(requests[index].userEmail),
+                              Text(requests[index].userEmail!),
                               Spacer(),
                               IconButton(
                                 color: Colors.green[700],
@@ -191,17 +190,16 @@ class _ManageMyPostState extends State<ManageMyPost> {
   }
 
   editEvent(Event event){
-    event.docId = widget.event.docId;
+    event.docId = widget.event!.docId;
     Navigator.of(context).pushNamed('/edit_event', arguments:  event);
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text("My Post"),
-        actions: widget.event.requireConfirmation == false ? [] : [
+        actions: widget.event!.requireConfirmation == false ? [] : [
           TextButton.icon(
             icon: Icon(Icons.all_inbox, color: Colors.white),
             onPressed: ()=> showRequests(),
@@ -210,14 +208,14 @@ class _ManageMyPostState extends State<ManageMyPost> {
         ],
       ),
       body: StreamBuilder<Event>(
-        stream: widget.event.liveUpdate,
+        stream: widget.event!.liveUpdate,
         builder: (context, snapshot) {
           if(snapshot.connectionState == ConnectionState.waiting){
             return Center(
               child: SpinKitFoldingCube(color: Colors.white,)
             );
           }
-          Event event = snapshot.data;
+          Event event = snapshot.data!;
           return Column(
             children: [
               WidgetMyPage(event, (){editEvent(event);}),
@@ -231,7 +229,7 @@ class _ManageMyPostState extends State<ManageMyPost> {
                       child: ElevatedButton.icon(
                         icon: Icon(Icons.group),
                         label: Text("Group chat"),
-                        onPressed: widget.event.groupChatEnabledID == null ? null : (){openGroupchat();},
+                        onPressed: widget.event!.groupChatEnabledID == null ? null : (){openGroupchat();},
                         style: ButtonStyle(
                             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                                 RoundedRectangleBorder(

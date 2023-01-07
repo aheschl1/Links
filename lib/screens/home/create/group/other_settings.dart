@@ -9,10 +9,10 @@ import 'package:provider/provider.dart';
 
 class OtherSettingsAndSave extends StatefulWidget {
 
-  final Function save;
-  final Group group;
+  final Function(Group) save;
+  final Group? group;
 
-  OtherSettingsAndSave({this.save, this.group});
+  OtherSettingsAndSave({required this.save, this.group});
 
   @override
   _OtherSettingsAndSaveState createState() => _OtherSettingsAndSaveState();
@@ -25,7 +25,7 @@ class _OtherSettingsAndSaveState extends State<OtherSettingsAndSave> {
   bool confirmation = true;
   bool anyoneCanPost = true;
 
-  List<FriendData> usersPermitted;
+  List<FriendData>? usersPermitted;
 
   List<Tag> tags = [];
 
@@ -34,22 +34,22 @@ class _OtherSettingsAndSaveState extends State<OtherSettingsAndSave> {
   void done() async {
     //cost
     //gc
-    String groupchatId = await DatabaseService().createGroupChat(auth.currentUser.uid);
-    widget.group.groupchatId = groupchatId;
+    String groupchatId = await DatabaseService().createGroupChat(auth.currentUser!.uid);
+    widget.group!.groupchatId = groupchatId;
 
-    widget.group.private = !public;
-    widget.group.requireConfirmation = confirmation;
-    widget.group.anyoneCanPost = anyoneCanPost;
+    widget.group!.private = !public;
+    widget.group!.requireConfirmation = confirmation;
+    widget.group!.anyoneCanPost = anyoneCanPost;
 
     if(usersPermitted != null){
       List permitted = [];
-      for(FriendData friend in usersPermitted){
+      for(FriendData friend in usersPermitted!){
         permitted.add(friend.userId);
       }
-      widget.group.usersPermitted = permitted;
+      widget.group!.usersPermitted = permitted;
     }
 
-    widget.save(widget.group);
+    widget.save(widget.group!);
 
   }
 
@@ -61,7 +61,7 @@ class _OtherSettingsAndSaveState extends State<OtherSettingsAndSave> {
       create: (data)=>  DatabaseService().getTags(),
       child: FutureProvider<List<FriendData>>(
         initialData: [],
-        create: (data) => DatabaseService().getUserFriends(auth.currentUser.uid),
+        create: (data) => DatabaseService().getUserFriends(auth.currentUser!.uid),
         child: Container(
           padding: EdgeInsets.all(8),
           child: Column(

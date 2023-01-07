@@ -12,11 +12,11 @@ import 'package:provider/provider.dart';
 
 class OtherSettingsAndSave extends StatefulWidget {
 
-  final Function save;
+  final Function(Event) save;
   final Event event;
   final bool group;
 
-  OtherSettingsAndSave({this.save, this.event, this.group = false});
+  OtherSettingsAndSave({required this.save, required this.event, this.group = false});
 
   @override
   _OtherSettingsAndSaveState createState() => _OtherSettingsAndSaveState();
@@ -25,12 +25,12 @@ class OtherSettingsAndSave extends StatefulWidget {
 
 class _OtherSettingsAndSaveState extends State<OtherSettingsAndSave> {
 
-  AccountLevels accountLevelStatus;
+  AccountLevels? accountLevelStatus;
 
   bool public = true;
   bool groupchat = true;
   bool confirmation = true;
-  List<FriendData> usersPermitted;
+  List<FriendData>? usersPermitted;
   String price = "1";
   bool free = true;
 
@@ -46,7 +46,7 @@ class _OtherSettingsAndSaveState extends State<OtherSettingsAndSave> {
     widget.event.admissionPrice = price;
     //gc
     if(groupchat){
-      String groupchatId = await DatabaseService().createGroupChat(auth.currentUser.uid);
+      String groupchatId = await DatabaseService().createGroupChat(auth.currentUser!.uid);
       widget.event.groupChatEnabledID = groupchatId;
     }
 
@@ -55,7 +55,7 @@ class _OtherSettingsAndSaveState extends State<OtherSettingsAndSave> {
 
     if(usersPermitted != null){
       List permitted = [];
-      for(FriendData friend in usersPermitted){
+      for(FriendData friend in usersPermitted!){
         permitted.add(friend.userId);
       }
       widget.event.usersPermitted = permitted;
@@ -81,15 +81,12 @@ class _OtherSettingsAndSaveState extends State<OtherSettingsAndSave> {
 
   @override
   Widget build(BuildContext context) {
-
-    print(widget.group);
-
     return FutureProvider<List<Tag>>(
       initialData: [],
       create: (data)=>  DatabaseService().getTags(),
       child: FutureProvider<List<FriendData>>(
         initialData: [],
-        create: (data) => DatabaseService().getUserFriends(auth.currentUser.uid),
+        create: (data) => DatabaseService().getUserFriends(auth.currentUser!.uid),
         child: Container(
           padding: EdgeInsets.all(8),
           child: Column(
@@ -170,12 +167,9 @@ class _OtherSettingsAndSaveState extends State<OtherSettingsAndSave> {
               ),
               SizedBox(height: 8,),
               widget.group ? SizedBox() : SelectTags(
-                onChanged: (data){
-                  setState(() {
-                    tags = data;
-                    print(tags.map((e) => e.name).toList());
-                  });
-                },
+                onChanged: (data) {
+                  tags = data;
+                }
               ),
               SizedBox(height: 20,),
               ElevatedButton.icon(

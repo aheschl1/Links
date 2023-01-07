@@ -17,22 +17,22 @@ class Groupchat extends StatefulWidget {
 
 class _GroupchatState extends State<Groupchat> {
 
-  Event event;
-  Group group;
+  Event? event;
+  Group? group;
   TextEditingController messageController = TextEditingController();
-  FriendData me;
+  FriendData? me;
 
   sendMessage() async {
     String content = messageController.text;
     Message message = Message(
       content: content,
-      senderDisplayName: me.name,
-      senderUid: me.userId,
+      senderDisplayName: me!.name,
+      senderUid: me!.userId,
       timeStamp: DateTime.now().millisecondsSinceEpoch
     );
     bool sent = await DatabaseService().sendMessageToGroupChat(
       message: message,
-      groupchatId: event == null ? group.groupchatId : event.groupChatEnabledID
+      groupchatId: event == null ? group!.groupchatId : event!.groupChatEnabledID
     );
 
     if(!sent){
@@ -45,8 +45,8 @@ class _GroupchatState extends State<Groupchat> {
   }
 
   getMyUserData() async {
-    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser.uid));
-    me.userId = FirebaseAuth.instance.currentUser.uid;
+    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid));
+    me!.userId = FirebaseAuth.instance.currentUser!.uid;
   }
 
   @override
@@ -54,13 +54,13 @@ class _GroupchatState extends State<Groupchat> {
 
     getMyUserData();
     try{
-      event = ModalRoute.of(context).settings.arguments as Event;
+      event = ModalRoute.of(context)!.settings.arguments as Event;
     }catch(e){
-      group = ModalRoute.of(context).settings.arguments as Group;
+      group = ModalRoute.of(context)!.settings.arguments as Group;
     }
 
     return StreamBuilder<QuerySnapshot>(
-      stream: DatabaseService().streamGroupchat(event == null ? group.groupchatId : event.groupChatEnabledID),
+      stream: DatabaseService().streamGroupchat(event == null ? group!.groupchatId : event!.groupChatEnabledID),
       builder: (context,  AsyncSnapshot<QuerySnapshot> snapshot){
         if(snapshot.hasError){
           return Text("Something went wrong");
@@ -72,7 +72,7 @@ class _GroupchatState extends State<Groupchat> {
 
         return Scaffold(
           appBar: AppBar(
-            title: Text("${event == null ? group.name : event.title} group chat"),
+            title: Text("${event == null ? group!.name : event!.title} group chat"),
           ),
           body: Column(
             children: [
@@ -81,9 +81,9 @@ class _GroupchatState extends State<Groupchat> {
                 child: ListView.builder(
                   padding: EdgeInsets.all(8),
                   reverse: true,
-                  itemCount: snapshot.data.docs.length,
+                  itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index){
-                    Message message = Message.fromMap(snapshot.data.docs[index].data());
+                    Message message = Message.fromMap(snapshot.data!.docs[index].data() as Map);
                     return MessageView(message: message,);
                   },
                 ),

@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:links/constants/ad_ids.dart';
 import 'package:links/constants/group.dart';
 import 'package:links/constants/level_types.dart';
 import 'package:links/services/database_service.dart';
 import 'package:links/services/shared_service.dart';
-import 'package:links/widgets/ad_widget.dart';
 import 'package:links/widgets/group_widget.dart';
 
 class FindGroups extends StatefulWidget {
 
-  final Function notInterestedInGroup;
-  final Function joinGroup;
+  final Function(Group) notInterestedInGroup;
+  final Function(Group) joinGroup;
 
-  FindGroups({this.notInterestedInGroup, this.joinGroup});
+  FindGroups({required this.notInterestedInGroup, required this.joinGroup});
 
   @override
   _FindGroupsState createState() => _FindGroupsState();
@@ -23,7 +21,7 @@ class _FindGroupsState extends State<FindGroups> {
 
   final key = GlobalKey<AnimatedListState>();
   int currentGroupIndex = 0;
-  AccountLevels accountLevelStatus;
+  AccountLevels? accountLevelStatus;
 
   List<bool> getDisplayOutline(events){
     List<bool> outline = [];
@@ -70,7 +68,7 @@ class _FindGroupsState extends State<FindGroups> {
           builder: (context, snapshot){
             if(snapshot.connectionState == ConnectionState.done){
 
-              List<Group> groupsToDiaplsy = snapshot.data;
+              List<Group> groupsToDiaplsy = snapshot.data!;
               List displayOutline = getDisplayOutline(groupsToDiaplsy);
 
               return Container(
@@ -83,7 +81,6 @@ class _FindGroupsState extends State<FindGroups> {
                   initialItemCount: displayOutline.length,
                   key: key,
                   itemBuilder: (context, int index, animation){
-                    if(!displayOutline[index]){
                       Group group = groupsToDiaplsy[currentGroupIndex];
                       currentGroupIndex ++;
                       if (currentGroupIndex == groupsToDiaplsy.length)
@@ -104,13 +101,13 @@ class _FindGroupsState extends State<FindGroups> {
                           group: group,
                           join: (){
                             widget.joinGroup(group);
-                            snapshot.data.removeAt(index);
-                            key.currentState.removeItem(index, (context,animation)=>SizedBox());
+                            snapshot.data!.removeAt(index);
+                            key.currentState!.removeItem(index, (context,animation)=>SizedBox());
                           },
                           notInterested: () {
                             widget.notInterestedInGroup(group);
-                            snapshot.data.removeAt(index);
-                            key.currentState.removeItem(index, (context,animation)=>SizedBox());
+                            snapshot.data!.removeAt(index);
+                            key.currentState!.removeItem(index, (context,animation)=>SizedBox());
                           },
                         ),
 
@@ -144,9 +141,7 @@ class _FindGroupsState extends State<FindGroups> {
 
                       );
 
-                    }else{
-                      return AdControl(adId: AdIds().publicGroupAdId,);
-                    }
+
 
                   },
                 ),

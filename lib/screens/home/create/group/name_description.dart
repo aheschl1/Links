@@ -4,10 +4,10 @@ import 'package:links/constants/group.dart';
 
 class EnterNameAndDescription extends StatefulWidget {
 
-  final Function finished;
-  final Group group;
+  final Function(Group?) finished;
+  final Group? group;
 
-  EnterNameAndDescription({this.finished, this.group});
+  EnterNameAndDescription({required this.finished, this.group});
 
   @override
   _EnterNameAndDescriptionState createState() => _EnterNameAndDescriptionState();
@@ -16,13 +16,13 @@ class EnterNameAndDescription extends StatefulWidget {
 class _EnterNameAndDescriptionState extends State<EnterNameAndDescription> {
 
   final _formKey = GlobalKey<FormState>();
-  String title;
-  String description;
+  String title = "";
+  String description = "";
 
   done(){
-    if(_formKey.currentState.validate()){
-      widget.group.description = description;
-      widget.group.name = title;
+    if(_formKey.currentState!.validate()){
+      widget.group!.description = description;
+      widget.group!.name = title;
       widget.finished(widget.group);
     }
 
@@ -58,7 +58,7 @@ class _EnterNameAndDescriptionState extends State<EnterNameAndDescription> {
                   TextFormField(
                     style: TextStyle(color: Colors.black),
                     validator: (val){
-                      if(val.length <= 20 && val.length >= 3){
+                      if(val!.length <= 20 && val.length >= 3){
                         return null;
                       }else if(val.length > 20){
                         return "Must be shorter then 21 characters";
@@ -79,7 +79,7 @@ class _EnterNameAndDescriptionState extends State<EnterNameAndDescription> {
                     maxLines: 5,
                     minLines: 5,
                     validator: (val){
-                      if(val.length <= 100 && val.length >= 10){
+                      if(val!.length <= 100 && val.length >= 10){
                         return null;
                       }else if(val.length > 100){
                         return "Must be shorter then 100 characters";

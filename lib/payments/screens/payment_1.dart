@@ -1,9 +1,10 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_braintree/flutter_braintree.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_braintree/flutter_braintree.dart';
 import 'package:links/constants/event.dart';
 import 'package:links/constants/friend_data.dart';
+import 'package:links/constants/payment_constants.dart';
 import 'package:links/constants/request.dart';
 import 'package:links/services/database_service.dart';
 import 'package:links/widgets/event_widget.dart';
@@ -17,21 +18,21 @@ class PaymentMainPage extends StatefulWidget {
 }
 
 class _PaymentMainPageState extends State<PaymentMainPage> {
-  Event event;
-  FriendData me;
+  Event? event;
+  FriendData? me;
 
   startPayment() async {
 
     final request = BraintreeDropInRequest(
-      tokenizationKey: 'sandbox_q7zgyn9g_fr7wvkwvcn3mw39z',
+      tokenizationKey: BraintreeConstants.getTokenizationKey(),
       collectDeviceData: true,
       googlePaymentRequest: BraintreeGooglePaymentRequest(
-        totalPrice: event.admissionPrice,
+        totalPrice: event!.admissionPrice!,
         currencyCode: 'CAD',
         billingAddressRequired: false,
       ),
       paypalRequest: BraintreePayPalRequest(
-        amount: event.admissionPrice,
+        amount: event!.admissionPrice,
         displayName: 'Links',
       ),
     );
@@ -56,18 +57,18 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
       },
     );
 
-    BraintreeDropInResult result = await BraintreeDropIn.start(request);
+    BraintreeDropInResult? result = await BraintreeDropIn.start(request);
 
     if (result != null) {
       var resultHTTP = await http.post(
           Uri.parse("https://us-central1-links-170cf.cloudfunctions.net/paypalPayment"),
           body: {
             'payment_method_nonce': result.paymentMethodNonce.toString(),
-            'ammount': event.admissionPrice,
+            'ammount': event!.admissionPrice,
             'device_data': result.deviceData,
-            'userID': FirebaseAuth.instance.currentUser.uid,
-            'eventId': event.docId,
-            'paymentRecipient': event.owner
+            'userID': FirebaseAuth.instance.currentUser!.uid,
+            'eventId': event!.docId,
+            'paymentRecipient': event!.owner
           });
 
       Navigator.pop(context);
@@ -77,22 +78,21 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
       }
     } else {
       Navigator.pop(context);
-      print('Selection was canceled.');
     }
   }
 
   void paymentSuccess(String body) {
-    joinEvent(event);
+    joinEvent(event!);
   }
 
   joinEvent(Event event) async {
     String result;
 
 
-    if(!event.requireConfirmation){
+    if(event.requireConfirmation == null || !event.requireConfirmation!){
       result = await DatabaseService().joinEvent(event);
     }else{
-      Request request = Request(userId: FirebaseAuth.instance.currentUser.uid, decision: Request.PENDING, userEmail: me.email, userName: me.name);
+      Request request = Request(userId: FirebaseAuth.instance.currentUser!.uid, decision: Request.PENDING, userEmail: me?.email, userName: me?.name);
       result = await DatabaseService().requestToJoin(event, request);
     }
     final snackBar = SnackBar(
@@ -103,7 +103,7 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
       snackBar,
     );
 
-    if(!event.requireConfirmation){
+    if(event.requireConfirmation == null || !event.requireConfirmation!){
       Navigator.of(context).pushReplacementNamed("/view_event", arguments:  event);
     }else{
       Navigator.of(context).pop();
@@ -111,7 +111,7 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
 
   }
   getMe()async{
-    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser.uid));
+    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid));
   }
 
   viewFriendProfile(FriendData friendData){
@@ -122,10 +122,11 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
     print('edit');
   }
 
+
   @override
   Widget build(BuildContext context) {
-    event = ModalRoute.of(context).settings.arguments as Event;
-    event.location = 'Location hidden until you pay';
+    event = ModalRoute.of(context)!.settings.arguments as Event;
+    event!.location = 'Location hidden until you pay';
     getMe();
     return Scaffold(
       appBar: AppBar(
@@ -133,9 +134,9 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
       ),
       body: Column(
         children: [
-          WidgetMyPage(event, (){editEvent();}),
+          WidgetMyPage(event!, (){editEvent();}),
           SizedBox(height: 10,),
-          ViewUsersInGroup(event: event, onTap: viewFriendProfile,),
+          ViewUsersInGroup(event: event!, onTap: viewFriendProfile,),
           Spacer(),
           Text(
             '8% of this payment will be collected as a transaction fee. If refunded, the balance will be deposited into your Links account. This can be collected from your profile!',
@@ -156,7 +157,8 @@ class _PaymentMainPageState extends State<PaymentMainPage> {
                 ))),
                 onPressed: () => startPayment(),
                 icon: Icon(Icons.payment),
-                label: Text("Pay and join")),
+                label: Text("Pay and join")
+            ),
           )
         ],
       ),

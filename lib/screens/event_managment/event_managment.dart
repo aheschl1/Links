@@ -11,16 +11,16 @@ class EventManagement extends StatefulWidget {
 
 class _EventManagementState extends State<EventManagement> {
 
-  Event event;
-  bool notif;
-  User user = FirebaseAuth.instance.currentUser;
+  Event? event;
+  bool? notif;
+  User user = FirebaseAuth.instance.currentUser!;
 
   @override
   Widget build(BuildContext context) {
 
-    event = ModalRoute.of(context).settings.arguments as Event;
+    event = ModalRoute.of(context)!.settings.arguments as Event;
 
-    return event.owner == user.uid ? ManageMyPost(event: event) : ManageEventIn(event:event);
+    return event!.owner == user.uid ? ManageMyPost(event: event) : ManageEventIn(event:event);
 
   }
 

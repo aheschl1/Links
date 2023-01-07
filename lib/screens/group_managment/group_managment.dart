@@ -12,13 +12,13 @@ class GroupManagement extends StatefulWidget {
 
 class _GroupManagementState extends State<GroupManagement> {
 
-  User user = FirebaseAuth.instance.currentUser;
+  User? user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
 
-    Group group = ModalRoute.of(context).settings.arguments as Group;
+    Group group = ModalRoute.of(context)!.settings.arguments as Group;
 
-    return group.owner == user.uid ? MyGroupOwn(group: group) : ViewMyGroupIn(group:group);
+    return group.owner == user!.uid ? MyGroupOwn(group: group) : ViewMyGroupIn(group:group);
   }
 }

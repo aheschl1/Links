@@ -8,10 +8,10 @@ import 'package:provider/provider.dart';
 class SelectTags extends StatefulWidget {
 
   final bool hide;
-  final Function onChanged;
-  final List currentlySelected;
+  final Function(List<Tag>) onChanged;
+  final List? currentlySelected;
 
-  SelectTags({this.hide = false, this.onChanged(List<Tag> data), this.currentlySelected});
+  SelectTags({this.hide = false, required this.onChanged(List<Tag> data), this.currentlySelected});
 
   @override
   _SelectTagsState createState() => _SelectTagsState();
@@ -21,24 +21,24 @@ class _SelectTagsState extends State<SelectTags> {
   @override
   Widget build(BuildContext context) {
 
-    List<Tag> friends = Provider.of<List<Tag>>(context);
-    List selectedPeople = [];
+    List<Tag> tags = Provider.of<List<Tag>>(context);
+    List selectedTags = [];
 
-    if(friends.isNotEmpty){
+    if(tags.isNotEmpty){
       return widget.hide ? SizedBox(height: 0, width: 0,) : MultiSelectDialogField(
         title: Text("Select Tags"),
         buttonText: Text("Select Tags"),
-        items: friends.map((e) => MultiSelectItem(e.id, e.name)).toList(),
+        items: tags.map((e) => MultiSelectItem(e.id, e.name)).toList(),
         listType: MultiSelectListType.CHIP,
-        initialValue: widget.currentlySelected != null ? friends.where((e){
-          if(widget.currentlySelected.contains(e.name)){
+        initialValue: widget.currentlySelected != null ? tags.where((e){
+          if(widget.currentlySelected!.contains(e.name)){
             return true;
           }
           return false;
         }).map((e)=>e.id.toString()).toList() : [],
         onConfirm: (values) {
-          selectedPeople = friends.where((e) => values.contains(e.id)).toList();
-          widget.onChanged(selectedPeople);
+          selectedTags = tags.where((e) => values.contains(e.id)).toList();
+          widget.onChanged(selectedTags as List<Tag>);
         },
       );
     }else{

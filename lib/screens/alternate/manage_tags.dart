@@ -14,12 +14,11 @@ class ManageTagSubs extends StatefulWidget {
 
 class _ManageTagSubsState extends State<ManageTagSubs> {
 
-  List<String> mySubbed = [];
+  List<String>? mySubbed = [];
   bool alreadyLoaded = false;
 
   getMySubs() async {
     List<String> tagsSubbed = await DatabaseService().getTagsSubbed();
-    print(tagsSubbed);
     setState(() {
       mySubbed = tagsSubbed;
     });
@@ -46,7 +45,7 @@ class _ManageTagSubsState extends State<ManageTagSubs> {
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       setState(() {
-        mySubbed.remove(tag.name);
+        mySubbed!.remove(tag.name);
       });
     }
   }
@@ -67,7 +66,7 @@ class _ManageTagSubsState extends State<ManageTagSubs> {
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       setState(() {
-        mySubbed.add(tag.name);
+        mySubbed!.add(tag.name);
       });
     }
   }
@@ -114,7 +113,7 @@ class _ManageTagSubsState extends State<ManageTagSubs> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                'You will only receive notifications for events with 50km of your location. You must temporarily turn your location to subscribe to new tags.',
+                'You will only receive notifications for events with 50km of your location. You must temporarily turn on your location to subscribe to new tags.',
                 style: TextStyle(
                     letterSpacing: 1,
                     fontSize: 12,
@@ -126,14 +125,14 @@ class _ManageTagSubsState extends State<ManageTagSubs> {
             Divider(height: 20,),
             Expanded(
               child: ListView.builder(
-                itemCount: snapshot.data.length,
+                itemCount: snapshot.data!.length,
                 itemBuilder: (context, index){
-                  Tag tag = snapshot.data[index];
+                  Tag tag = snapshot.data![index];
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SwitchListTile(
                       tileColor: Theme.of(context).cardColor,
-                      value: mySubbed != null && mySubbed.contains(tag.name),
+                      value: mySubbed != null && mySubbed!.contains(tag.name),
                       title: Text(tag.name),
                       onChanged: (val){
                         if(val){
@@ -142,12 +141,12 @@ class _ManageTagSubsState extends State<ManageTagSubs> {
                             if(mySubbed == null){
                               mySubbed = [];
                             }
-                            mySubbed.add(tag.name);
+                            mySubbed!.add(tag.name);
                           });
                         }else{
                           unsubscribeFromTag(tag);
                           setState(() {
-                            mySubbed.remove(tag.name);
+                            mySubbed!.remove(tag.name);
                           });
                         }
                       },

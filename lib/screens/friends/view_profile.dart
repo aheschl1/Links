@@ -15,20 +15,20 @@ class ViewFriend extends StatefulWidget {
 }
 
 class _ViewFriendState extends State<ViewFriend> {
-  FriendData friendData;
-  FriendData me;
+  FriendData? friendData;
+  FriendData? me;
   bool friends = false;
 
   joinEvent(Event event) async {
     String result;
 
-    if(double.parse(event.admissionPrice) > 0){
+    if(double.parse(event.admissionPrice!) > 0){
       Navigator.of(context).pushNamed("/payments", arguments: event);
     }else{
-      if(!event.requireConfirmation){
+      if(event.requireConfirmation == null || !event.requireConfirmation!){
         result = await DatabaseService().joinEvent(event);
       }else{
-        Request request = Request(userId: FirebaseAuth.instance.currentUser.uid, decision: Request.PENDING, userEmail: me.email, userName: me.name);
+        Request request = Request(userId: FirebaseAuth.instance.currentUser!.uid, decision: Request.PENDING, userEmail: me!.email, userName: me!.name);
         result = await DatabaseService().requestToJoin(event, request);
       }
 
@@ -56,9 +56,9 @@ class _ViewFriendState extends State<ViewFriend> {
 
 
   getFriendsAlready()async{
-    UserData userDate = await DatabaseService().getUserPreferences(FirebaseAuth.instance.currentUser.uid);
+    UserData? userDate = await DatabaseService().getUserPreferences(FirebaseAuth.instance.currentUser!.uid);
 
-    if(userDate.following.contains(friendData.userId)){
+    if(userDate!.following!.contains(friendData!.userId)){
       setState(() {
         friends = true;
       });
@@ -72,7 +72,7 @@ class _ViewFriendState extends State<ViewFriend> {
   }
 
   getMe()async{
-    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser.uid));
+    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid));
   }
 
   followPerson(FriendData friendData) async {
@@ -106,7 +106,7 @@ class _ViewFriendState extends State<ViewFriend> {
 
   @override
   Widget build(BuildContext context) {
-    friendData = ModalRoute.of(context).settings.arguments as FriendData;
+    friendData = ModalRoute.of(context)!.settings.arguments as FriendData;
 
     getMe();
 
@@ -115,7 +115,7 @@ class _ViewFriendState extends State<ViewFriend> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(friendData.name),
+        title: Text(friendData!.name),
       ),
       body: Column(
         children: [
@@ -126,7 +126,7 @@ class _ViewFriendState extends State<ViewFriend> {
               Column(
                 children: [
                   Text(
-                    friendData.name,
+                    friendData!.name,
                     style: TextStyle(
                         letterSpacing: 1,
                         fontSize: 25
@@ -134,7 +134,7 @@ class _ViewFriendState extends State<ViewFriend> {
                   ),
                   SizedBox(height: 10,),
                   Text(
-                    friendData.email,
+                    friendData!.email,
                     style: TextStyle(
                       letterSpacing: 1,
                     ),
@@ -144,7 +144,7 @@ class _ViewFriendState extends State<ViewFriend> {
               IconButton(
                 color: friends ? Theme.of(context).errorColor : Theme.of(context).buttonColor,
                 icon: friends ? Icon(Icons.person_remove) : Icon(Icons.person_add),
-                onPressed: friends ? ()=>removeFriend(friendData) : ()=>followPerson(friendData),
+                onPressed: friends ? ()=>removeFriend(friendData!) : ()=>followPerson(friendData!),
               )
             ],
           ),
@@ -152,7 +152,7 @@ class _ViewFriendState extends State<ViewFriend> {
           Flexible(
             flex: 0,
             child: Text(
-              friendData.bio,
+              friendData!.bio!,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontStyle: FontStyle.italic,
@@ -163,10 +163,10 @@ class _ViewFriendState extends State<ViewFriend> {
           Divider(height: 30,),
           Expanded(
             child: FutureBuilder<List<Event>>(
-                future: DatabaseService().getUserEventsCreated(friendData.userId),
+                future: DatabaseService().getUserEventsCreated(friendData!.userId!),
                 builder: (context, snapshot){
                   if(snapshot.connectionState == ConnectionState.done){
-                    eventsToDisplay = snapshot.data;
+                    eventsToDisplay = snapshot.data!;
                     return Container(
                       padding: EdgeInsets.fromLTRB(8, 15, 8, 8),
                       child:
@@ -194,13 +194,13 @@ class _ViewFriendState extends State<ViewFriend> {
                               event: event,
                               join: (){
                                 joinEvent(event);
-                                snapshot.data.removeAt(index);
-                                key.currentState.removeItem(index, (context,animation)=>SizedBox());
+                                snapshot.data!.removeAt(index);
+                                key.currentState!.removeItem(index, (context,animation)=>SizedBox());
                               },
                               notInterested: () {
                                 notInterestedInEvent(event);
-                                snapshot.data.removeAt(index);
-                                key.currentState.removeItem(index, (context,animation)=>SizedBox());
+                                snapshot.data!.removeAt(index);
+                                key.currentState!.removeItem(index, (context,animation)=>SizedBox());
                               },
                             ),
 

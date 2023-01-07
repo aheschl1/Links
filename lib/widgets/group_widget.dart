@@ -3,11 +3,11 @@ import 'package:links/constants/group.dart';
 
 class MyGroupWidget extends StatefulWidget {
 
-  final Function deleteEvent;
+  final Function()? deleteEvent;
   final Group group;
-  final Function more;
+  final Function()? more;
 
-  MyGroupWidget({this.group, this.deleteEvent, this.more});
+  MyGroupWidget({required this.group, required this.deleteEvent, required this.more});
 
   @override
   _MyGroupWidgetState createState() => _MyGroupWidgetState();
@@ -40,7 +40,7 @@ class _MyGroupWidgetState extends State<MyGroupWidget> {
               ),
               SizedBox(height: 10),
               Text(
-                'Number of members: ${widget.group.usersIn != null ? widget.group.usersIn.length.toString() : '0'}' ,
+                'Number of members: ${widget.group.usersIn != null ? widget.group.usersIn!.length.toString() : '0'}' ,
                 style: TextStyle(
                     fontSize: 15,
                     fontStyle: FontStyle.italic
@@ -50,12 +50,12 @@ class _MyGroupWidgetState extends State<MyGroupWidget> {
               Row(
                 children: [
                   TextButton.icon(
-                    onPressed: widget.deleteEvent,
+                    onPressed:widget.deleteEvent,
                     icon: Icon(Icons.delete),
                     label: Text("Delete"),
                   ),
                   TextButton.icon(
-                    onPressed: widget.more,
+                    onPressed:widget.more,
                     icon: Icon(Icons.add),
                     label: Text("More"),
                   ),
@@ -130,11 +130,11 @@ class _GroupMyPageState extends State<GroupMyPage> {
 
 class MyGroupIn extends StatefulWidget {
 
-  final Function leaveGroup;
+  final Function()? leaveGroup;
   final Group group;
-  final Function more;
+  final Function()? more;
 
-  MyGroupIn({this.group, this.leaveGroup, this.more});
+  MyGroupIn({required this.group, required this.leaveGroup, required this.more});
 
   @override
   _MyGroupInState createState() => _MyGroupInState();
@@ -169,12 +169,12 @@ class _MyGroupInState extends State<MyGroupIn> {
               Row(
                 children: [
                   TextButton.icon(
-                    onPressed: widget.leaveGroup,
+                    onPressed: ()=>widget.leaveGroup,
                     icon: Icon(Icons.exit_to_app),
                     label: Text("Leave"),
                   ),
                   TextButton.icon(
-                    onPressed: widget.more,
+                    onPressed: ()=>widget.more,
                     icon: Icon(Icons.add),
                     label: Text("More"),
                   ),
@@ -191,10 +191,10 @@ class _MyGroupInState extends State<MyGroupIn> {
 class GroupWidget extends StatefulWidget {
 
   final Group group;
-  final Function join;
-  final Function notInterested;
+  final Function()? join;
+  final Function()? notInterested;
 
-  GroupWidget({this.group, this.join, this.notInterested});
+  GroupWidget({required this.group, required this.join, required this.notInterested});
 
   @override
   _GroupWidgetState createState() => _GroupWidgetState();
@@ -232,14 +232,14 @@ class _GroupWidgetState extends State<GroupWidget> {
               Row(
                 children: [
                   TextButton.icon(
-                    onPressed: widget.join,
+                    onPressed: ()=>widget.join,
                     icon: Icon(Icons.event_available),
                     label: Text(
-                        widget.group.requireConfirmation? "Request" : "Join"
+                        widget.group.requireConfirmation!? "Request" : "Join"
                     ),
                   ),
                   TextButton.icon(
-                    onPressed: widget.notInterested,
+                    onPressed: ()=>widget.notInterested,
                     icon: Icon(Icons.event_busy_rounded),
                     label: Text("Not interested"),
                   )

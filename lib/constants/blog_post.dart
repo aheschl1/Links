@@ -1,13 +1,13 @@
 class BlogPost{
 
   String content;
-  String owner;
-  String ownerName;
+  String? owner;
+  String? ownerName;
   String date;
   String title;
-  String docId;
+  String? docId;
 
-  BlogPost({this.content, this.owner, this.ownerName, this.date, this.title});
+  BlogPost({required this.content, this.owner, this.ownerName, required this.date, required this.title});
 
   Map<String, dynamic> toMap() {
 

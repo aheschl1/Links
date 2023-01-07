@@ -7,7 +7,7 @@ import 'package:links/widgets/select_tags.dart';
 import 'package:provider/provider.dart';
 
 class EditEvent extends StatefulWidget {
-  const EditEvent({Key key}) : super(key: key);
+  const EditEvent({Key? key}) : super(key: key);
 
   @override
   _EditEventState createState() => _EditEventState();
@@ -18,28 +18,28 @@ class _EditEventState extends State<EditEvent> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-  List<Tag> tags;
+  List<Tag>? tags;
 
 
-  Event event;
-  Event newEvent;
+  Event? event;
+  Event? newEvent;
 
   saveChanges() async{
     bool result = await DatabaseService().editEvent(
-        event.docId, 
+        event!.docId!,
         title: titleController.text, 
         description: descriptionController.text,
-        tags: tags.map((e) => e.name).toList()
+        tags: tags!.map((e) => e.name).toList()
     );
     Navigator.of(context).pop(result);
   }
 
   @override
   void didChangeDependencies() {
-    event = ModalRoute.of(context).settings.arguments as Event;
-    tags = event.tags.map((e) => Tag(name: e)).toList();
-    titleController.text = event.title;
-    descriptionController.text = event.description;
+    event = ModalRoute.of(context)!.settings.arguments as Event;
+    tags = event!.tags!.map((e) => Tag(name: e)).toList();
+    titleController.text = event!.title;
+    descriptionController.text = event!.description;
     super.didChangeDependencies();
   }
 
@@ -61,7 +61,7 @@ class _EditEventState extends State<EditEvent> {
                   TextFormField(
                     style: TextStyle(color: Colors.black),
                     validator: (val){
-                      if(val.length <= 20 && val.length >= 3){
+                      if(val!.length <= 20 && val.length >= 3){
                         return null;
                       }else if(val.length > 20){
                         return "Must be shorter then 21 characters";
@@ -78,7 +78,7 @@ class _EditEventState extends State<EditEvent> {
                     maxLines: 5,
                     minLines: 2,
                     validator: (val){
-                      if(val.length <= 100 && val.length >= 10){
+                      if(val!.length <= 100 && val.length >= 10){
                         return null;
                       }else if(val.length > 100){
                         return "Must be shorter then 100 characters";
@@ -94,12 +94,9 @@ class _EditEventState extends State<EditEvent> {
                     initialData: [],
                     create: (data)=>  DatabaseService().getTags(),
                     child: SelectTags(
-                      currentlySelected: event.tags,
+                      currentlySelected: event!.tags!,
                       onChanged: (data){
-                        setState(() {
                           tags = data;
-                          print(tags.map((e) => e.name).toList());
-                        });
                       },
                     ),
                   ),

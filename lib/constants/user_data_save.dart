@@ -1,17 +1,26 @@
 
 class UserData{
 
-  List following = [];
-  List notInterested = [];
-  List myEventsJoined = [];
-  List awaitingRequest = [];
-  List subscribedTags = [];
-  List groupsIn = [];
-  List awaitingGroupRequests = [];
-  List awaitingRequestGroupEvent = [];
-  String paypalKey = "";
+  List? following = [];
+  List? notInterested = [];
+  List? myEventsJoined = [];
+  List? awaitingRequest = [];
+  List? subscribedTags = [];
+  List? groupsIn = [];
+  List? awaitingGroupRequests = [];
+  List? awaitingRequestGroupEvent = [];
+  String? paypalKey = "";
 
-  UserData({this.paypalKey = "", this.myEventsJoined, this.notInterested, this.following, this.awaitingRequest, this.subscribedTags, this.groupsIn, this.awaitingGroupRequests, this.awaitingRequestGroupEvent});
+  UserData({
+    this.paypalKey = "",
+    this.myEventsJoined,
+    this.notInterested,
+    this.following,
+    this.awaitingRequest,
+    this.subscribedTags,
+    this.groupsIn,
+    this.awaitingGroupRequests,
+    this.awaitingRequestGroupEvent});
 
   Map<String, dynamic> toMap() {
     return {

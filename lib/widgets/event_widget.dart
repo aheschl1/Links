@@ -7,10 +7,10 @@ import 'package:links/constants/event.dart';
 class EventWidget extends StatefulWidget {
 
   final Event event;
-  final Function join;
-  final Function notInterested;
+  final Function()? join;
+  final Function()? notInterested;
 
-  EventWidget({this.event, this.join, this.notInterested});
+  EventWidget({required this.event, required this.join, required this.notInterested});
 
   @override
   _EventWidgetState createState() => _EventWidgetState();
@@ -66,8 +66,8 @@ class _EventWidgetState extends State<EventWidget> {
                 ),
               ),
               SizedBox(height: 10),
-              widget.event.tags != null && widget.event.tags.length > 0 ? Text(
-                "Tags: ${formatString(widget.event.tags)}",
+              widget.event.tags != null && widget.event.tags!.length > 0 ? Text(
+                "Tags: ${formatString(widget.event.tags!)}",
                 style: TextStyle(
                   fontSize: 15,
                 ),
@@ -76,14 +76,14 @@ class _EventWidgetState extends State<EventWidget> {
               Row(
                 children: [
                   TextButton.icon(
-                      onPressed: widget.join,
+                      onPressed:()=>widget.join,
                       icon: Icon(Icons.event_available),
                       label: Text(
-                          widget.event.requireConfirmation? "Request" : double.parse(widget.event.admissionPrice) > 0 ? "Join ${widget.event.admissionPrice}\$" : "Join"
+                          widget.event.requireConfirmation!=null && widget.event.requireConfirmation! ? "Request" : double.parse(widget.event.admissionPrice!) > 0 ? "Join ${widget.event.admissionPrice}\$" : "Join"
                       ),
                   ),
                   TextButton.icon(
-                    onPressed: widget.notInterested,
+                    onPressed: ()=>widget.notInterested,
                     icon: Icon(Icons.event_busy_rounded),
                     label: Text("Not interested"),
                   )
@@ -109,11 +109,11 @@ class _EventWidgetState extends State<EventWidget> {
 
 class MyEventWidget extends StatefulWidget {
 
-  final Function deleteEvent;
+  final Function()? deleteEvent;
   final Event event;
-  final Function more;
+  final Function()? more;
 
-  MyEventWidget({this.event, this.deleteEvent, this.more});
+  MyEventWidget({required this.event, required this.deleteEvent, required this.more});
 
   @override
   _MyEventWidgetState createState() => _MyEventWidgetState();
@@ -192,11 +192,11 @@ class _MyEventWidgetState extends State<MyEventWidget> {
 
 class MyEventIn extends StatefulWidget {
 
-  final Function leaveEvent;
+  final Function()? leaveEvent;
   final Event event;
-  final Function more;
+  final Function()? more;
 
-  MyEventIn({this.event, this.leaveEvent, this.more});
+  MyEventIn({required this.event, required this.leaveEvent, required this.more});
 
   @override
   _MyEventInState createState() => _MyEventInState();
@@ -253,12 +253,12 @@ class _MyEventInState extends State<MyEventIn> {
               Row(
                 children: [
                   TextButton.icon(
-                    onPressed: widget.leaveEvent,
+                    onPressed:()=> widget.leaveEvent,
                     icon: Icon(Icons.exit_to_app),
                     label: Text("Leave"),
                   ),
                   TextButton.icon(
-                    onPressed: widget.more,
+                    onPressed: ()=>widget.more,
                     icon: Icon(Icons.add),
                     label: Text("More"),
                   ),
@@ -274,7 +274,7 @@ class _MyEventInState extends State<MyEventIn> {
 
 class WidgetMyPage extends StatefulWidget {
   final Event event;
-  final Function edit;
+  final Function()? edit;
   WidgetMyPage(this.event, this.edit);
 
   @override
@@ -335,8 +335,8 @@ class _WidgetMyPageState extends State<WidgetMyPage> {
             ),
           ),
           SizedBox(height: 8),
-          widget.event.tags != null && widget.event.tags.length > 0 ? Text(
-            "Tags: ${formatString(widget.event.tags)}",
+          widget.event.tags != null && widget.event.tags!.length > 0 ? Text(
+            "Tags: ${formatString(widget.event.tags!)}",
             style: TextStyle(
               fontSize: 15,
             ),

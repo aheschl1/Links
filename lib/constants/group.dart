@@ -1,18 +1,20 @@
+import 'package:links/services/database_service.dart';
+
 class Group{
 
-  List usersIn;
-  String owner;
-  bool private;
+  List? usersIn;
+  String? owner;
+  bool? private;
   String name;
   String description;
-  String groupchatId;
-  bool requireConfirmation;
-  List usersPermitted;
-  bool anyoneCanPost;
-  String docId;
+  String? groupchatId;
+  bool? requireConfirmation;
+  List? usersPermitted;
+  bool? anyoneCanPost;
+  String? docId;
 
 
-  Group({this.groupchatId, this.name, this.private, this.usersPermitted, this.owner, this.usersIn, this.requireConfirmation, this.description, this.anyoneCanPost});
+  Group({this.groupchatId, required this.name, this.private, this.usersPermitted, this.owner, this.usersIn, this.requireConfirmation, required this.description, this.anyoneCanPost});
 
   Map<String, dynamic> toMap() {
 
@@ -27,6 +29,10 @@ class Group{
       "usersIn" : usersIn,
       "anyoneCanPost" : anyoneCanPost
     };
+  }
+
+  get liveUpdate {
+    return DatabaseService().getGroupStream(this);
   }
 
   static Group fromMap(Map data) {

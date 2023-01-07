@@ -10,18 +10,18 @@ class CreateGroup extends StatefulWidget {
   @override
   _CreateGroupState createState() => _CreateGroupState();
 
-  final Function changeIndex;
+  final Function(int) changeIndex;
 
-  CreateGroup({this.changeIndex});
+  CreateGroup({required this.changeIndex});
 
 }
 
 class _CreateGroupState extends State<CreateGroup> {
 
   int currentScreen = 0;
-  Group futureGroup = Group();
+  Group? futureGroup;
 
-  startNextStage(Group group){
+  startNextStage(Group? group){
     setState(() {
       futureGroup = group;
       currentScreen ++;
@@ -31,19 +31,17 @@ class _CreateGroupState extends State<CreateGroup> {
 
   saveGroup(Group group) async {
     futureGroup = group;
-    futureGroup.owner = FirebaseAuth.instance.currentUser.uid;
+    futureGroup!.owner = FirebaseAuth.instance.currentUser!.uid;
 
     String result = await DatabaseService().addGroup(group);
     final snackBar = SnackBar(
-      content: Text(result != null ? "Group created" : "Something went wrong"),
+      content: Text(result != "Error" ? "Group created" : "Something went wrong"),
       behavior: SnackBarBehavior.floating, // Add this line
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
-    print(result);
-
     await FirebaseMessaging.instance.subscribeToTopic(result);
-    FirebaseMessaging.instance.subscribeToTopic(group.groupchatId);
+    FirebaseMessaging.instance.subscribeToTopic(group.groupchatId!);
 
     widget.changeIndex(0);
 

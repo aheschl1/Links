@@ -3,17 +3,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_braintree/flutter_braintree.dart';
 import 'package:http/http.dart' as http;
+import 'package:links/constants/payment_constants.dart';
 
 class ProDescription extends StatelessWidget {
 
-  const ProDescription({Key key}) : super(key: key);
+  const ProDescription({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
 
-    startPayment(String amount, int level, Function paymentSuccess, Function paymentFailure) async {
+    startPayment(String amount, int level, Function(String) paymentSuccess, Function(String) paymentFailure) async {
       final request = BraintreeDropInRequest(
-        tokenizationKey: 'sandbox_q7zgyn9g_fr7wvkwvcn3mw39z',
+        tokenizationKey: BraintreeConstants.getTokenizationKey(),
         collectDeviceData: true,
         googlePaymentRequest: BraintreeGooglePaymentRequest(
           totalPrice: amount,
@@ -46,7 +47,7 @@ class ProDescription extends StatelessWidget {
         },
       );
 
-      BraintreeDropInResult result = await BraintreeDropIn.start(request);
+      BraintreeDropInResult? result = await BraintreeDropIn.start(request);
 
       if (result != null) {
         var resultHTTP = await http.post(
@@ -55,7 +56,7 @@ class ProDescription extends StatelessWidget {
               'payment_method_nonce': result.paymentMethodNonce.toString(),
               'ammount': amount,
               'device_data': result.deviceData,
-              'userID': FirebaseAuth.instance.currentUser.uid,
+              'userID': FirebaseAuth.instance.currentUser!.uid,
               'upgradeLevel' : level.toString()
             });
         Navigator.pop(context);
@@ -66,7 +67,6 @@ class ProDescription extends StatelessWidget {
         }
       } else {
         Navigator.pop(context);
-        print('Selection was canceled.');
       }
     }
 

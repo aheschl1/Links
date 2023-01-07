@@ -4,10 +4,10 @@ import 'dart:math' as math;
 @immutable
 class ExpandableFab extends StatefulWidget {
   const ExpandableFab({
-    Key key,
-    this.initialOpen,
-    this.distance,
-    this.children,
+    Key? key,
+    required this.initialOpen,
+    required this.distance,
+    required this.children,
   }) : super(key: key);
 
   final bool initialOpen;
@@ -20,14 +20,14 @@ class ExpandableFab extends StatefulWidget {
 
 class _ExpandableFabState extends State<ExpandableFab>
     with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<double> _expandAnimation;
+  AnimationController? _controller;
+  Animation<double>? _expandAnimation;
   bool _open = false;
 
   @override
   void initState() {
     super.initState();
-    _open = widget.initialOpen ?? false;
+    _open = widget.initialOpen;
     _controller = AnimationController(
       value: _open ? 1.0 : 0.0,
       duration: const Duration(milliseconds: 250),
@@ -36,13 +36,13 @@ class _ExpandableFabState extends State<ExpandableFab>
     _expandAnimation = CurvedAnimation(
       curve: Curves.fastOutSlowIn,
       reverseCurve: Curves.easeOutQuad,
-      parent: _controller,
+      parent: _controller!,
     );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
@@ -50,9 +50,9 @@ class _ExpandableFabState extends State<ExpandableFab>
     setState(() {
       _open = !_open;
       if (_open) {
-        _controller.forward();
+        _controller!.forward();
       } else {
-        _controller.reverse();
+        _controller!.reverse();
       }
     });
   }
@@ -107,7 +107,7 @@ class _ExpandableFabState extends State<ExpandableFab>
         _ExpandingActionButton(
           directionInDegrees: angleInDegrees,
           maxDistance: widget.distance,
-          progress: _expandAnimation,
+          progress: _expandAnimation!,
           child: widget.children[i],
         ),
       );
@@ -144,11 +144,11 @@ class _ExpandableFabState extends State<ExpandableFab>
 @immutable
 class _ExpandingActionButton extends StatelessWidget {
   _ExpandingActionButton({
-    Key key,
-     this.directionInDegrees,
-     this.maxDistance,
-     this.progress,
-     this.child,
+    Key? key,
+     required this.directionInDegrees,
+     required this.maxDistance,
+    required this.progress,
+    required this.child,
   }) : super(key: key);
 
   final double directionInDegrees;
@@ -185,9 +185,9 @@ class _ExpandingActionButton extends StatelessWidget {
 @immutable
 class ActionButton extends StatelessWidget {
   const ActionButton({
-    Key key,
-    this.onPressed,
-    this.icon,
+    Key? key,
+    required this.onPressed,
+    required this.icon,
   }) : super(key: key);
 
   final VoidCallback onPressed;
@@ -215,8 +215,8 @@ class ActionButton extends StatelessWidget {
 @immutable
 class FakeItem extends StatelessWidget {
   const FakeItem({
-    Key key,
-     this.isBig,
+    Key? key,
+    required this.isBig,
   }) : super(key: key);
 
   final bool isBig;

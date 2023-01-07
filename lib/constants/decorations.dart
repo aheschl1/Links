@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 class Decorations{
-  BuildContext context;
+  BuildContext? context;
 
   Decorations({this.context});
 
@@ -17,6 +17,17 @@ class Decorations{
           const Radius.circular(50.0),
         ),
       ),
+    );
+  }
+
+  ButtonStyle getButtonStyle1(){
+    return ButtonStyle(
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(50.0),
+            )
+        ),
+        elevation: MaterialStateProperty.all(10)
     );
   }
 

@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
-import 'package:links/constants/ad_ids.dart';
+import 'package:geoflutterfire2/geoflutterfire2.dart';
 import 'package:links/constants/event.dart';
 import 'package:links/constants/level_types.dart';
 import 'package:links/services/database_service.dart';
 import 'package:links/services/shared_service.dart';
-import 'package:links/widgets/ad_widget.dart';
 import 'package:links/widgets/event_widget.dart';
 
 class FindEvents extends StatefulWidget {
 
-  final GeoFirePoint currentPosition;
+  final GeoFirePoint? currentPosition;
   final DateTime startDate;
   final DateTime endDate;
   final double radius;
-  final Function notInterestedInEvent;
-  final Function joinEvent;
+  final Function(Event) notInterestedInEvent;
+  final Function(Event) joinEvent;
 
-  FindEvents({this.currentPosition, this.radius, this.startDate, this.endDate, this.notInterestedInEvent, this.joinEvent});
+  FindEvents({this.currentPosition, required this.radius, required this.startDate, required this.endDate, required this.notInterestedInEvent, required this.joinEvent});
 
   @override
   _FindEventsState createState() => _FindEventsState();
@@ -28,7 +26,7 @@ class _FindEventsState extends State<FindEvents> {
 
   final key = GlobalKey<AnimatedListState>();
   int currentEventIndex = 0;
-  AccountLevels accountLevelStatus;
+  AccountLevels? accountLevelStatus;
 
   List<bool> getDisplayOutline(events) {
    List<bool> outline = [];
@@ -55,6 +53,9 @@ class _FindEventsState extends State<FindEvents> {
 
   getAccountLevel() async {
     AccountLevels temp = await SharedPreferenceService.getAccountLevel();
+    if(!mounted){
+      return;
+    }
     setState(() {
       accountLevelStatus = temp;
     });
@@ -70,10 +71,10 @@ class _FindEventsState extends State<FindEvents> {
   Widget build(BuildContext context) {
     return Expanded(
       child: FutureBuilder<List<Event>> (
-          future: widget.currentPosition == null ? DatabaseService().getPublicEventsToDisplay(8, range: DateTimeRange(start: widget.startDate, end: widget.endDate)) :DatabaseService().getPublicEventsToDisplayLocationFiltered(8, widget.currentPosition, radius: widget.radius, range: DateTimeRange(start: widget.startDate, end: widget.endDate)),
+          future: widget.currentPosition == null ? DatabaseService().getPublicEventsToDisplay(8, range: DateTimeRange(start: widget.startDate, end: widget.endDate)) :DatabaseService().getPublicEventsToDisplayLocationFiltered(8, widget.currentPosition!, radius: widget.radius, range: DateTimeRange(start: widget.startDate, end: widget.endDate)),
           builder: (context, snapshot){
             if(snapshot.connectionState == ConnectionState.done){
-              List<Event> eventsToDisplay = snapshot.data;
+              List<Event> eventsToDisplay = snapshot.data!;
               List displayOutline = getDisplayOutline(eventsToDisplay);
               return Container(
                 padding: EdgeInsets.fromLTRB(8, 15, 8, 8),
@@ -82,7 +83,6 @@ class _FindEventsState extends State<FindEvents> {
                   initialItemCount: displayOutline.length,
                   key: key,
                   itemBuilder: (context, int index, animation){
-                    if(!displayOutline[index]) {
                       Event item = eventsToDisplay[currentEventIndex];
                       currentEventIndex ++;
                       if (currentEventIndex == eventsToDisplay.length)
@@ -102,14 +102,14 @@ class _FindEventsState extends State<FindEvents> {
                           event: item,
                           join: () {
                             widget.joinEvent(item);
-                            snapshot.data.removeAt(index);
-                            key.currentState.removeItem(
+                            snapshot.data!.removeAt(index);
+                            key.currentState!.removeItem(
                                 index, (context, animation) => SizedBox());
                           },
                           notInterested: () {
                             widget.notInterestedInEvent(item);
-                            snapshot.data.removeAt(index);
-                            key.currentState.removeItem(
+                            snapshot.data!.removeAt(index);
+                            key.currentState!.removeItem(
                                 index, (context, animation) => SizedBox());
                           },
                         ),
@@ -143,9 +143,7 @@ class _FindEventsState extends State<FindEvents> {
                         ),
 
                       );
-                    }else{
-                      return AdControl(adId: AdIds().publicEventAdId,);
-                    }
+
                   },
                 ),
               );

@@ -15,11 +15,11 @@ class PrivateMessage extends StatefulWidget {
 
 class _PrivateMessageState extends State<PrivateMessage> {
 
-  Event event;
+  Event? event;
   TextEditingController messageController = TextEditingController();
-  FriendData me;
+  FriendData? me;
 
-  String to;
+  String? to;
 
   bool haveCheckedDocExist = false;
 
@@ -27,13 +27,13 @@ class _PrivateMessageState extends State<PrivateMessage> {
     String content = messageController.text;
     Message message = Message(
         content: content,
-        senderDisplayName: me.name,
-        senderUid: me.userId,
+        senderDisplayName: me!.name,
+        senderUid: me!.userId,
         timeStamp: DateTime.now().millisecondsSinceEpoch
     );
     bool sent = await DatabaseService().sendMessageToFromOwner(
         message: message,
-        event: event,
+        event: event!,
         to: to
     );
 
@@ -46,7 +46,7 @@ class _PrivateMessageState extends State<PrivateMessage> {
 
     if(!haveCheckedDocExist){
       DatabaseService().ensureDocExists(
-          event: event,
+          event: event!,
           to: to
       );
       haveCheckedDocExist = true;
@@ -56,24 +56,24 @@ class _PrivateMessageState extends State<PrivateMessage> {
   }
 
   getMyUserData() async {
-    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser.uid));
-    me.userId = FirebaseAuth.instance.currentUser.uid;
+    me = FriendData.fromMap(await DatabaseService().getUser(FirebaseAuth.instance.currentUser!.uid));
+    me!.userId = FirebaseAuth.instance.currentUser!.uid;
   }
 
   @override
   Widget build(BuildContext context) {
 
     getMyUserData();
-    Map data = ModalRoute.of(context).settings.arguments as Map;
+    Map data = ModalRoute.of(context)!.settings.arguments as Map;
     event = data['event'];
     if(data['to'] != null){
       to = data['to'];
     }else{
-      to = FirebaseAuth.instance.currentUser.uid;
+      to = FirebaseAuth.instance.currentUser!.uid;
     }
 
     return StreamBuilder<QuerySnapshot>(
-        stream: DatabaseService().streamMessagesWithOwner(event, from: to),
+        stream: DatabaseService().streamMessagesWithOwner(event!, from: to),
         builder: (context,  AsyncSnapshot<QuerySnapshot> snapshot){
           if(snapshot.hasError){
             return Text("Something went wrong");
@@ -85,7 +85,7 @@ class _PrivateMessageState extends State<PrivateMessage> {
 
           return Scaffold(
             appBar: AppBar(
-              title: Text("${event.title} owner chat"),
+              title: Text("${event!.title} owner chat"),
             ),
             body: Column(
               children: [
@@ -94,9 +94,9 @@ class _PrivateMessageState extends State<PrivateMessage> {
                   child: ListView.builder(
                     padding: EdgeInsets.all(8),
                     reverse: true,
-                    itemCount: snapshot.data.docs.length,
+                    itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index){
-                      Message message = Message.fromMap(snapshot.data.docs[index].data());
+                      Message message = Message.fromMap(snapshot.data!.docs[index].data() as Map);
                       return MessageView(message: message,);
                     },
                   ),

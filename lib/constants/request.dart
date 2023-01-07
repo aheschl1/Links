@@ -10,13 +10,13 @@ class Request{
 
   int decision;
   String userId;
-  String userName;
-  String userEmail;
-  Event eventAttached;
-  Group groupAttached;
-  String docId;
+  String? userName;
+  String? userEmail;
+  Event? eventAttached;
+  Group? groupAttached;
+  String? docId;
 
-  Request({this.userId, this.decision, this.userName, this.userEmail});
+  Request({required this.userId, required this.decision, required this.userName, required this.userEmail});
 
   Map<String, dynamic> toMap() {
     return {

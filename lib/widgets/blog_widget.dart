@@ -5,10 +5,10 @@ import 'package:links/constants/blog_post.dart';
 class BlogWidget extends StatefulWidget {
 
   final BlogPost blog;
-  final Function more;
-  final Function delete;
+  final Function()? more;
+  final Function()? delete;
 
-  BlogWidget({this.blog, this.more, this.delete});
+  BlogWidget({required this.blog, required this.more, required this.delete});
 
   @override
   _BlogWidgetState createState() => _BlogWidgetState();
@@ -60,14 +60,14 @@ class _BlogWidgetState extends State<BlogWidget> {
               Row(
                 children: [
                   TextButton.icon(
-                    onPressed: widget.more,
+                    onPressed: ()=>widget.more,
                     icon: Icon(Icons.add),
                     label: Text(
                        'See more'
                     ),
                   ),
-                  widget.blog.owner == FirebaseAuth.instance.currentUser.uid ? TextButton.icon(
-                    onPressed: widget.delete,
+                  widget.blog.owner == FirebaseAuth.instance.currentUser!.uid ? TextButton.icon(
+                    onPressed:()=> widget.delete,
                     icon: Icon(Icons.event_busy_rounded),
                     label: Text("Delete"),
                   ) : SizedBox()

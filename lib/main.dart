@@ -18,7 +18,6 @@ import 'package:links/services/database_service.dart';
 import 'package:links/services/notification_service.dart';
 import 'package:links/services/shared_service.dart';
 import 'package:links/wrapper.dart';
-import 'package:native_admob_flutter/native_admob_flutter.dart';
 import 'package:place_picker/place_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:links/screens/friends/manage_friends.dart';
@@ -29,16 +28,11 @@ import 'constants/level_types.dart';
 
 void main(){
 
-
   WidgetsFlutterBinding.ensureInitialized();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  bool onboarding = false;
-
   Future<bool> initialzeApp() async {
-    onboarding = await SharedPreferenceService.getOnboardingComplete() ?? true;
     await Firebase.initializeApp();
-    await MobileAds.initialize();
     AccountLevels level = await DatabaseService().getAccountLevel();
     await SharedPreferenceService.setAccountLevel(level);
     return true;
@@ -52,7 +46,7 @@ void main(){
 
         if(snapshot.connectionState == ConnectionState.done && snapshot.hasData){
 
-          return StreamProvider<User>.value(
+          return StreamProvider<User?>.value(
             initialData: null,
             value: AuthService( ).user,
 
@@ -72,7 +66,7 @@ void main(){
                 )
               ),
               routes: {
-                '/': (context)=>Wrapper(onboarding: onboarding,),
+                '/': (context)=>Wrapper(),
                 '/settings':(context)=>Settings(),
                 '/view_event':(context)=>EventManagement(),
                 '/view_group':(context)=>GroupManagement(),
@@ -106,31 +100,31 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 
   if(message.data['unsubscribe'] != null){
-    print(message.data['unsubscribe']);
     FirebaseMessaging.instance.unsubscribeFromTopic(message.data['unsubscribe']);
   }
 
   if(message.data['subscribe'] != null){
-    print(message.data['subscribe']);
     FirebaseMessaging.instance.subscribeToTopic(message.data['subscribe']);
   }
 
   if(message.data['notify'] == 'true'){
 
-    LatLng position = await SharedPreferenceService.getLocation();
+    LatLng? position = await SharedPreferenceService.getLocation();
 
-    double distanceFromUser = Geolocator.distanceBetween(position.latitude, position.longitude, double.parse(message.data['latitude']), double.parse(message.data['longitude'])) / 1000.0;
+    if(position != null) {
+      double distanceFromUser = Geolocator.distanceBetween(position.latitude, position.longitude, double.parse(message.data['latitude']), double.parse(message.data['longitude'])) / 1000.0;
 
-    if(position != null && distanceFromUser <= 50){
-      String title = message.data['title'];
-      String body = message.data['body'];
+      if(distanceFromUser <= 50){
+        String title = message.data['title'];
+        String body = message.data['body'];
 
-      NotificationService notificationService = NotificationService(
-          title: title,
-          body: body
-      );
+        NotificationService notificationService = NotificationService(
+            title: title,
+            body: body
+        );
 
-      notificationService.showNotification();
+        notificationService.showNotification();
+      }
     }
 
   }

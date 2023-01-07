@@ -12,7 +12,7 @@
         android:icon="@mipmap/ic_launcher">
 
        <meta-data android:name="com.google.android.geo.API_KEY"
-           android:value="AIzaSyDavOnmlKHv2dKYcPmxoNCMnl9foHeKftY"/>
+           android:value="AIzaSyDQsi3TnwIWsNl_IJs63sIzw__418mSlKE"/>
 
        <meta-data android:name="com.google.android.gms.wallet.api.enabled" android:value="true"/>
 

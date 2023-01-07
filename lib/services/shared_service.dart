@@ -4,9 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferenceService{
   
-  static Future<LatLng> getLocation() async {
+  static Future<LatLng?> getLocation() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List latLng = prefs.getStringList('location');
+    List? latLng = prefs.getStringList('location');
     if(latLng != null){
       return LatLng(double.parse(latLng[0]), double.parse(latLng[1]));
     }else{
@@ -21,8 +21,8 @@ class SharedPreferenceService{
 
   static Future<AccountLevels> getAccountLevel() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    AccountLevels level = AccountLevels.values[prefs.getInt('level')];
-    return level == null ? AccountLevels.BASIC : level;
+    AccountLevels level = AccountLevels.values[prefs.getInt('level')??0];
+    return level;
   }
 
   static Future<bool> setAccountLevel(AccountLevels level) async {
@@ -30,15 +30,5 @@ class SharedPreferenceService{
     return await prefs.setInt('level', AccountLevels.values.indexOf(level));
   }
 
-  static Future<bool> getOnboardingComplete() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool complete = prefs.getBool('onnboardingcomplete');
-    return complete;
-  }
-
-  static Future<bool> setOnboardingComplete(bool complete) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return await prefs.setBool('onnboardingcomplete', complete);
-  }
 
 }

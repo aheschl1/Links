@@ -1,11 +1,11 @@
 
 class FriendData{
-  String userId;
+  String? userId;
   String name;
   String email;
-  String bio;
+  String? bio;
 
-  FriendData({this.bio, this.userId, this.name, this.email});
+  FriendData({this.bio, required this.name, required this.email});
 
   Map<String, dynamic> toMap() {
     return {
@@ -18,7 +18,6 @@ class FriendData{
 
   static FriendData fromMap(Map data) {
     return FriendData(
-        userId: data['userId'],
         name: data['name'],
         email: data['email'],
         bio: data['bio']

@@ -7,7 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
 class CollectPayout extends StatefulWidget {
-  const CollectPayout({Key key}) : super(key: key);
+  const CollectPayout({Key? key}) : super(key: key);
 
   @override
   _CollectPayoutState createState() => _CollectPayoutState();
@@ -31,13 +31,13 @@ class _CollectPayoutState extends State<CollectPayout> {
   loginWithPaypal() async {
 
     final Uri uri = Uri.https(
-        'links-170cf.firebaseapp.com',
+        'links-170cf.web.app',
         '/paypal_auth.html',
         {
-          'uid' : FirebaseAuth.instance.currentUser.uid
+          'uid' : FirebaseAuth.instance.currentUser!.uid
         }
     );
-    await canLaunch(uri.toString()) ? await launch(uri.toString()) : throw 'Something went wrong';
+    await canLaunchUrl(uri) ? await launchUrl(uri) : throw 'Something went wrong';
     Navigator.of(context).pop();
   }
 
@@ -66,7 +66,7 @@ class _CollectPayoutState extends State<CollectPayout> {
     var resultHTTP = await http.post(
         Uri.parse("https://us-central1-links-170cf.cloudfunctions.net/requestUserPayout"),
         body: {
-          'uid' : FirebaseAuth.instance.currentUser.uid,
+          'uid' : FirebaseAuth.instance.currentUser!.uid,
         });
 
     Navigator.pop(context);
@@ -82,14 +82,14 @@ class _CollectPayoutState extends State<CollectPayout> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: FutureBuilder<UserData>(
-        future: DatabaseService().getUserPreferences(FirebaseAuth.instance.currentUser.uid),
+      child: FutureBuilder<UserData?>(
+        future: DatabaseService().getUserPreferences(FirebaseAuth.instance.currentUser!.uid),
         builder: (context, snapshot){
           if(snapshot.connectionState == ConnectionState.done){
 
-            UserData myData = snapshot.data;
+            UserData? myData = snapshot.data;
 
-            if(myData.paypalKey == null || myData.paypalKey.length == 0){
+            if(myData!.paypalKey == null || myData.paypalKey!.length == 0){
               return Column(
                 children: [
                   SizedBox(height: 10,),
